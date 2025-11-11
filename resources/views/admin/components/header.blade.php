@@ -80,7 +80,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('admin.profile') }}">
+                            <a class="dropdown-item" href="{{ route('admin.password') }}">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="lni lni-key"></i></div>
                                     <div class="ms-3"><span>Change password</span></div>

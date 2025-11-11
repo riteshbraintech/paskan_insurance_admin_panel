@@ -39,7 +39,6 @@
                 </li>
             </ul>
         </li> --}}
-        
 
         {{-- @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN]))
             
@@ -101,7 +100,7 @@
             </li>
         @endif --}}
 
-        {{-- @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN,\App\Models\Role::MANAGER]))
+        {{-- @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'report' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.report.list') }}" >
                     <i class="fa-solid fa-file"></i>
@@ -110,10 +109,10 @@
             </li>
         @endif --}}
 
-        
-        <li class="menu-heading-title"><span>Manage CSM Pages</span></li>
 
-        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN,\App\Models\Role::MANAGER]))
+        <li class="menu-heading-title"><span>Admin Workplace</span></li>
+
+        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'cmspage' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.cmspage.index') }}">
                     <i class="fa-solid fa-file"></i>
@@ -123,15 +122,40 @@
         @endif
 
         
-        <li class="menu-heading-title"><span>Manage Categories</span></li>
-        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN,\App\Models\Role::MANAGER]))
+        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
+            <li class="categories {{ in_array($segment, ['categories', 'categoryformfield']) ? 'mm-active' : '' }}">
+                <a href="javascript:void(0);"
+                    class="has-arrow {{ in_array($segment, ['categories', 'categoryformfield']) ? 'mm-active' : '' }}">
+                    <i class="fa-solid fa-folder-tree"></i>
+                    <div class="menu-title">Manage Categories</div>
+                </a>
+                <ul
+                    class="mm-collapse new-submenu {{ in_array($segment, ['categories', 'categoryformfield']) ? 'mm-show' : '' }}">
+                    <li class="{{ $segment == 'categories' ? 'mm-active' : '' }}">
+                        <a href="{{ route('admin.categories.index') }}">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Edit Category
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-list-check"></i>
+                            Manage Form Fields
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endif
+
+
+        {{-- @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'categories' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.categories.index') }}">
                     <i class="fa-solid fa-folder-tree"></i>
                     <div class="menu-title">Categories</div>
                 </a>
             </li>
-        @endif
+        @endif --}}
 
         {{-- <li class="{{ $segment == 'project' ? 'mm-active' : '' }}">
             <a href="javascript:;" class="has-arrow dropdown">
@@ -158,27 +182,26 @@
     //         $(".page-content").addClass("full-width");
     //     });
     // });
-    function sidenav(){
+    function sidenav() {
         let status = $(".sidebar-wrapper").attr('data-show');
-        if(status == "on"){
-            $(".sidebar-wrapper").attr('data-show','off');
-            $(".sidebar-wrapper").css('width','3.9rem');
+        if (status == "on") {
+            $(".sidebar-wrapper").attr('data-show', 'off');
+            $(".sidebar-wrapper").css('width', '3.9rem');
             $(".dropdown").removeClass('has-arrow');
-            $(".page-content").css('margin-left','3.9rem');
-            $(".sidebar-header").css('width','3.9rem');
-            $(".sidebar-header img").css('display','none');
-            $(".sidebar-header .logo-text").css('display','none');
-            $(".navbar ").css('margin-left','-12.9rem');
-        }
-        else if(status == "off"){
-            $(".sidebar-wrapper").attr('data-show','on');
-            $(".sidebar-wrapper").css('width','260px');
-            $(".page-content").css('margin-left','260px');
+            $(".page-content").css('margin-left', '3.9rem');
+            $(".sidebar-header").css('width', '3.9rem');
+            $(".sidebar-header img").css('display', 'none');
+            $(".sidebar-header .logo-text").css('display', 'none');
+            $(".navbar ").css('margin-left', '-12.9rem');
+        } else if (status == "off") {
+            $(".sidebar-wrapper").attr('data-show', 'on');
+            $(".sidebar-wrapper").css('width', '260px');
+            $(".page-content").css('margin-left', '260px');
             $(".dropdown").addClass('has-arrow');
-            $(".sidebar-header").css('width','260px');
-            $(".navbar ").css('margin-left','0');
-            $(".sidebar-header img").css('display','block');
-            $(".sidebar-header .logo-text").css('display','block');
+            $(".sidebar-header").css('width', '260px');
+            $(".navbar ").css('margin-left', '0');
+            $(".sidebar-header img").css('display', 'block');
+            $(".sidebar-header .logo-text").css('display', 'block');
         }
     }
 </script>
