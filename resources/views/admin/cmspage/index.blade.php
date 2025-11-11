@@ -7,7 +7,9 @@
         }
     </style>
 
-    @include('admin.components.FlashMessage')
+    <div id="flash-message-container">
+        @include('admin.components.FlashMessage')
+    </div>
 
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
         <div class="breadcrumb-title pe-3">All CMS Pages</div>
@@ -50,8 +52,8 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('public/admin/js/common.js') }}"></script>
     <script>
-
             function changeStatus(event,id){
                 let url = "{{route('admin.cmspage.change.status')}}"+"/"+id;
                 $.ajax({
@@ -64,15 +66,17 @@
                             $(`.status-${id}`).html("Yes");
                             $(`.status-${id}`).addClass("badge-success");
                             $(`.status-${id}`).removeClass("badge-danger");
+                            showFlashMessage('success', response.message || 'Status changed successfully!');
                         }else{
                             $(`.status-${id}`).html("No");
                             $(`.status-${id}`).addClass("badge-danger");
                             $(`.status-${id}`).removeClass("badge-success");
+                            showFlashMessage('success', response.message || 'Status changed successfully!');
                         }
                     }
                 }); 
             }
-            
+  
         $(document).on("click",".selectItems",function(){
             if($('.selectItems:checked').length > 1){
                 $('.mergeIcon').show();

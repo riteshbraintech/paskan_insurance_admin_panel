@@ -21,8 +21,7 @@
                     <td>{{ $i }}</td>
                     <td>
                         <img src="{{ $item->image_url }}" alt="Category Image"
-                            width="60" height="50"
-                            style="object-fit: contain; border-radius: 6px; border: 1px solid #ddd; background-color: #f8f9fa;">
+                            style="object-fit: contain;border-radius: 6px;border: 1px solid #ddd;background-color: #f8f9fa;max-width: 35px;height: 35px;padding: 4px;">
                     </td>
 
                     {{-- // display title for each language --}}
