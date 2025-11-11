@@ -68,7 +68,7 @@ a {
     top: 0;
     left: 260px;
     right: 0;
-    background-color: #111240;
+    background-color: #fff;
     border-bottom: 1px solid #e2e3e4;
     background-clip: padding-box;
     height: 60px;
@@ -401,7 +401,7 @@ a {
     left: 0;
     width: 260px;
     height: 100%;
-    background-color: #f7f8fa;
+    background-color: #05061e;
     background-clip: padding-box;
     border-right: 1px solid #e2e3e4;
     transition: all .2s;
@@ -1855,4 +1855,63 @@ span.badge-success{background: #111240; color:white}
 label.error {
 	color: #dc3545;
 	font-size: 14px;
+}
+
+.page-link{
+	color: #111240;
+}
+.page-item.active .page-link{
+	background-color: #111240;
+    border-color: #111240;
+}
+.table>:not(:last-child)>:last-child>*{
+	border-bottom-color: rgb(255 255 255);
+}
+/* For the first cell in each row */
+tr th:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+/* For the last cell in each row */
+tr th:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+a {
+    color: #111240;
+    /* text-decoration: underline; */
+}
+.fa, .fas {
+    font-size: 12px;
+    margin-right: 4px;
+}
+.btn{
+	border-radius: 5px;
+	font-size: 0.9rem;
+}
+.btn-group>.btn-group:not(:first-child)>.btn, .btn-group>.btn:nth-child(n+3), .btn-group>:not(.btn-check)+.btn {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.fs-5 {
+    font-size: 1rem !important;
+}
+.text-info{
+color: #0c0c2c !important;
+}
+.bg-info {
+    background-color: #0e0e33c7 !important;
+}
+.text-primary {
+    color: #0e0e33 !important;
+}
+.menu-heading-title{
+	font-size: 11px;
+    margin: 7px 5px;
+    margin-top: 15px !important;
+    color: #818181;
+    font-weight: 100;
+    font-weight: 500;
+    text-transform: uppercase;
 }
