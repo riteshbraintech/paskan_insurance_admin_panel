@@ -41,7 +41,7 @@
             <h2>Dashboard</h2>
         </div>
 
-        <div class="col-md-9">
+        {{-- <div class="col-md-9">
             <div class="row g-1">
                 <div class="col-lg-4 d-flex flex-row"> 
                     <button class="prev-month btn btn-outline-secondary px-1" style="height: 2.4rem;"><i class="fa fa-angle-left" aria-hidden='true'></i></button>
@@ -93,7 +93,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <div>
@@ -152,7 +152,7 @@
                                 </div>
                             </div>
             
-                            {{-- <div class="col-md-2">
+                            <div class="col-md-2">
                                 @php
                                     $archieved_percentage = (float)(($archieved / 50000) * 100);
                                 @endphp
@@ -160,7 +160,7 @@
                                 <div class="progress" style="height: 38px;">
                                     <div class="progress-bar" style="color:black;" role="progressbar" style="width: {{$archieved_percentage}}%;" aria-valuenow="{{$archieved_percentage}}" aria-valuemin="{{$archieved_percentage}}" aria-valuemax="100">$&nbsp;{{$archieved}}</div>
                                 </div>
-                            </div> --}}
+                            </div>
 
                             <div class="col-md-2">
                                 @php

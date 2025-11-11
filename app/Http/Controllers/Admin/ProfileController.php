@@ -48,6 +48,10 @@ class ProfileController extends Controller
         }
     }
 
+    public function displaypassword(){
+        return view('admin.updatepassword');
+    }
+    
     public function updatePassword(UpdatePasswordRequest $request)
     {
         try {

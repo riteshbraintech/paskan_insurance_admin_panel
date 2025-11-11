@@ -44,11 +44,12 @@
                             @else
                                 <img src="{{ loadAssets('images/avatars/avatar-1.png') }}" class="user-img" alt="">
                             @endif
+                            <h6 class="mb-0 dropdown-user-name" style="margin-left: 8px;color:#000;">{{ Str::ucfirst(admin()->user()->name) }}</h6>
                         </div>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
+                        {{-- <li>
                             <a class="dropdown-item" href="#">
                                 <div class="d-flex align-items-center">
                                     @if (!empty(admin()->user()->image))
@@ -65,16 +66,24 @@
                                     </div>
                                 </div>
                             </a>
-                        </li>
+                        </li> --}}
 
-                        <li>
+                        {{-- <li>
                             <hr class="dropdown-divider">
-                        </li>
+                        </li> --}}
                         <li>
                             <a class="dropdown-item" href="{{ route('admin.profile') }}">
                                 <div class="d-flex align-items-center">
                                     <div class=""><i class="lni lni-user"></i></div>
                                     <div class="ms-3"><span>Profile</span></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.password') }}">
+                                <div class="d-flex align-items-center">
+                                    <div class=""><i class="lni lni-key"></i></div>
+                                    <div class="ms-3"><span>Change password</span></div>
                                 </div>
                             </a>
                         </li>

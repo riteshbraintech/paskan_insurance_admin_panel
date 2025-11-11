@@ -29,7 +29,7 @@ class CMSController extends Controller
             }); 
         }
 
-        $records = $records->orderBy('id','desc')->paginate($perPage);
+        $records = $records->sortable('id','desc')->paginate($perPage);
         // dd($records);
 
         if (!empty($isAjax)) {
@@ -49,7 +49,7 @@ class CMSController extends Controller
     public function store(CMSPageRequest $request)
     {
         DB::beginTransaction();
-        
+
         try {
 
             // pick english title and make as slug an ttitle for cms_page table
@@ -235,13 +235,25 @@ class CMSController extends Controller
     }
 
 
-    public function changeStatus(Request $request){
-        $record = CMSPage::findOrFail($request->id);
-        $status = $record->is_published ? 0 : 1;
-        $record->status = $status;
+    // public function changeStatus(Request $request){
+    //     // dd($request);
+    //     $record = CMSPage::findOrFail($request->id);
+    //     $status = $record->is_published ? 0 : 1;
+    //     $record->is_published = $status;
+    //     $record->save();
+    //     return response()->json(['status' => $status]);
+    // }
+
+    public function changeStatus($id)
+    {
+        $record = CMSPage::findOrFail($id);
+
+        $record->is_published = $record->is_published == 1 ? 0 : 1;
         $record->save();
+        $status = $record->is_published == 1 ? 'yes' : 'no';
         return response()->json(['status' => $status]);
     }
+
 
 
 }

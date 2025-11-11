@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Kyslik\ColumnSortable\Sortable;
+
+class Category extends Model
+{
+    use HasFactory, Sortable;
+
+    protected $fillable = ['title', 'slug', 'is_active', 'image'];
+    public $sortable = ['id', 'title', 'is_active'];
+
+    // create a is active scope to filter active categories
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    // create image url accessor
+    public function getImageUrlAttribute()
+    {
+        // $imagePath = $item->image ? asset('/public/admin/categories/img/' . $item->image) : asset('/public/admin/categories/img/default.png');
+        if ($this->image) {
+            return asset('/public/admin/categories/img/' . $this->image);
+        }
+        return asset('/public/admin/categories/img/default.png');
+    }
+
+
+    // set slug attribute to be lowercase and replace spaces with hyphens based on title before saving to database
+    public function setSlugAttribute($value)
+    {
+        $this->attributes['slug'] = Str::slug($this->attributes['title']);
+    }
+
+    // create hasmany relationship with CMSPageTranslation
+    public function translations()
+    {
+        return $this->hasMany(CategoryTranslation::class, 'category_id');
+    }
+
+    // crate a hasOne realtion to get translation in current app locale
+    public function translation()
+    {
+        return $this->hasOne(CategoryTranslation::class, 'category_id')
+                    ->where('lang_code', app()->getLocale());
+    }
+
+    
+}

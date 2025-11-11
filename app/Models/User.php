@@ -22,9 +22,30 @@ class User extends Authenticatable
 
     protected $guarded = ['id'];
 
-    // protected $fillable = [
-    //     'name', 'email', 'password',
-    // ];
+    protected $fillable = [
+        'member_id',
+        'certification_id',
+        'name',
+        'email',
+        'password',
+        'dial_code',
+        'phone',
+        'gender',
+        'dob',
+        'country_id',
+        'address',
+        'postcode',
+        'wallet_amount',
+        'remarks',
+        'subscribed',
+        'status',
+        'is_active',
+        'device_name',
+        'device_type',
+        'device_id',
+        'firebase_token',
+        'image',
+    ];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -45,13 +66,13 @@ class User extends Authenticatable
         'phone_verified_at' => 'datetime',
     ];
 
-    public function address()
-    {
-        return $this->hasOne(UserAddress::class, 'user_id')->latestOfMany();
-    }
+    // public function address()
+    // {
+    //     return $this->hasOne(UserAddress::class, 'user_id')->latestOfMany();
+    // }
 
-    public function orders()
-    {
-        return $this->hasMany(FoodOrder::class, 'user_id');
-    }
+    // public function orders()
+    // {
+    //     return $this->hasMany(FoodOrder::class, 'user_id');
+    // }
 }

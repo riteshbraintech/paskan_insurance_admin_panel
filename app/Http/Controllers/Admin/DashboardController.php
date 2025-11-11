@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Bid;
+use App\Models\Category;
+use App\Models\CMSPage;
 use App\Models\Lead;
 use App\Models\Portal;
 use App\Models\Role;
+use App\Models\User;
 use App\Scopes\IsClonedScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +19,22 @@ use Illuminate\Support\Facades\Log;
 use Session;
 class DashboardController extends Controller
 {
+
+    public function getdata(){
+        $cmspages=CMSPage::with('translations')->get();
+
+        $categories=Category::with('translations')->get();
+
+        $user=User::all();
+        return view('admin.dashboard',compact('cmspages','categories','user'));
+    }
     private $excludeIds = [42, 33, 51];
     public function index(Request $request)
     {
+        $cmspages = CMSPage::with('translations')->where('is_published', 1)->get();
+        $categories = Category::with('translations')->where('is_active', 1)->get();
+        $users = User::all();
+
         $staffs_list = $staffs_dd = [];
         $role_id = admin()->user()->role_id;
         $IsAjax = $request->method;
@@ -168,7 +184,7 @@ class DashboardController extends Controller
             $archieved = $data['archieved'];
             $short_fall = $data['short_fall'];
             
-            return view('admin.dashboard',compact('staff_bid_list','staff_lead_list','bid','lead','hot_lead','awardeds','staffs_dd','managers_dd','calnder_datas','month_dates','record','awarded_per_month','graph_filter','todayFollowUpLeads','total_hot_lead','portals','target','received','archieved','short_fall'));
+            return view('admin.dashboard',compact('cmspages', 'categories', 'users','staff_bid_list','staff_lead_list','bid','lead','hot_lead','awardeds','staffs_dd','managers_dd','calnder_datas','month_dates','record','awarded_per_month','graph_filter','todayFollowUpLeads','total_hot_lead','portals','target','received','archieved','short_fall'));
         }        
     }
 

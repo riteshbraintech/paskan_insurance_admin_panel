@@ -101,6 +101,18 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            @foreach (langueses() as $langCode => $language)
+                ClassicEditor
+                    .create(document.querySelector('#trans_{{ $langCode }}_content'))
+                    .then(editor => {
+                        editor.ui.view.editable.element.style.minHeight = '200px';
+                    })
+                    .catch(error => console.error(error));
+            @endforeach
+        });
     </script>
 @endpush

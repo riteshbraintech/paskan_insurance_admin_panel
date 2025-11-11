@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\BidController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CategoryFormFieldController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\ClientController;
@@ -29,11 +31,13 @@ Route::prefix('/admin')->group(function () {
         Route::post('status/{id?}', [CMSController::class, 'changeStatus'])->name('admin.cmspage.change.status');
 
 
+
         Route::get('sessionMode', [DashboardController::class, 'sessionMode'])->name('admin.session.mode');
         Route::get('refresh-target-data', [DashboardController::class, 'refreshTargetData'])->name('admin.dashboard.refresh-target-data');
         
         Route::get('profile', [ProfileController::class, 'profile'])->name('admin.profile');
         Route::post('updateProfile', [ProfileController::class, 'updateProfile'])->name('admin.updateProfile');
+        Route::get('password', [ProfileController::class, 'displaypassword'])->name('admin.password');
         Route::post('updatePassword', [ProfileController::class, 'updatePassword'])->name('admin.updatePassword');
 
         Route::group(['prefix' => 'role'], function () {
@@ -145,6 +149,36 @@ Route::prefix('/admin')->group(function () {
             Route::post('update/{id?}', [ProjectController::class, 'update'])->name('admin.project.update');
             Route::get('delete/{id?}', [ProjectController::class, 'destroy'])->name('admin.project.delete');
         });
+
+
+        // Categories route
+        Route::group(['prefix'=>'categories'],function(){
+            Route::get('/',[CategoryController::class,'index'])->name('admin.categories.index');
+            Route::get('create', [CategoryController::class, 'create'])->name('admin.categories.create');
+            Route::post('store', [CategoryController::class, 'store'])->name('admin.categories.store');
+            Route::post('status/{id?}', [CategoryController::class, 'changeStatus'])->name('admin.categories.change.status');
+            Route::get('edit/{id?}', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+            Route::post('update/{id?}', [CategoryController::class, 'update'])->name('admin.categories.update');
+            Route::get('delete/{id?}', [CategoryController::class, 'delete'])->name('admin.categories.delete');
+            Route::get('view/{id?}', [CategoryController::class, 'view'])->name('admin.categories.view');
+        });
+
+        // Category form field route
+        Route::group(['prefix'=>'categoryformfield'],function(){
+            Route::get('/',[CategoryFormFieldController::class,'index'])->name('admin.categoryformfield.index');
+            Route::get('create', [CategoryFormFieldController::class, 'create'])->name('admin.categoryformfield.create');
+            Route::post('store', [CategoryFormFieldController::class, 'store'])->name('admin.categoryformfield.store');
+            Route::post('status/{id?}', [CategoryFormFieldController::class, 'changeStatus'])->name('admin.categoryformfield.change.status');
+            Route::get('edit/{id?}', [CategoryFormFieldController::class, 'edit'])->name('admin.categoryformfield.edit');
+            Route::post('update/{id?}', [CategoryFormFieldController::class, 'update'])->name('admin.categoryformfield.update');
+            Route::get('delete/{id?}', [CategoryFormFieldController::class, 'delete'])->name('admin.categoryformfield.delete');
+            Route::get('view/{id?}', [CategoryFormFieldController::class, 'view'])->name('admin.categoryformfield.view');
+            Route::get('filter', [CategoryFormFieldController::class, 'filter'])->name('admin.categoryformfield.filter');
+            Route::post('reorder', [CategoryFormFieldController::class, 'reorder'])->name('admin.categoryformfield.reorder');
+
+        });        
+
+
     });
 
     require __DIR__ . '/admin-auth.php';
