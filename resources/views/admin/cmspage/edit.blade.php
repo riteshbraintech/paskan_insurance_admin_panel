@@ -53,7 +53,7 @@
                             @endphp
                             <div class="col-md-12">
                                 <label class="form-label">Content ({{ $language }})</label>
-                                <textarea name="trans[{{ $langCode }}][content]" class="form-control" rows="3">{{ $contentValue }}</textarea>
+                                <textarea name="trans[{{ $langCode }}][content]" id="trans_{{ $langCode }}_content"  class="form-control" rows="3">{{ $contentValue }}</textarea>
                                 @error("trans.$langCode.content")
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
@@ -111,3 +111,20 @@
     </div>
 </div>
 @endsection
+
+
+@push('scripts')
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            @foreach (langueses() as $langCode => $language)
+                ClassicEditor
+                    .create(document.querySelector('#trans_{{ $langCode }}_content'))
+                    .then(editor => {
+                        editor.ui.view.editable.element.style.minHeight = '200px';
+                    })
+                    .catch(error => console.error(error));
+            @endforeach
+        });
+    </script>
+@endpush

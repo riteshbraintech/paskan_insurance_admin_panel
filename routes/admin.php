@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\BidController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\ClientController;
@@ -27,6 +28,7 @@ Route::prefix('/admin')->group(function () {
         // --- Admin Routes for CMS Pages (Protected) ---
         Route::resource('cmspage', CMSController::class)->names('admin.cmspage');
         Route::post('status/{id?}', [CMSController::class, 'changeStatus'])->name('admin.cmspage.change.status');
+
 
 
         Route::get('sessionMode', [DashboardController::class, 'sessionMode'])->name('admin.session.mode');
@@ -145,6 +147,23 @@ Route::prefix('/admin')->group(function () {
             Route::post('update/{id?}', [ProjectController::class, 'update'])->name('admin.project.update');
             Route::get('delete/{id?}', [ProjectController::class, 'destroy'])->name('admin.project.delete');
         });
+
+
+        // Categories route
+        Route::group(['prefix'=>'categories'],function(){
+            Route::get('/list',[CategoryController::class,'index'])->name('admin.categories.index');
+            Route::get('create', [CategoryController::class, 'create'])->name('admin.categories.create');
+            Route::post('store', [CategoryController::class, 'store'])->name('admin.categories.store');
+            Route::post('status/{id?}', [CategoryController::class, 'changeStatus'])->name('admin.categories.change.status');
+            Route::get('edit/{id?}', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+            Route::post('update/{id?}', [CategoryController::class, 'update'])->name('admin.categories.update');
+            Route::get('delete/{id?}', [CategoryController::class, 'delete'])->name('admin.categories.delete');
+            Route::get('view/{id?}', [CategoryController::class, 'view'])->name('admin.categories.view');
+
+        });
+
+
+
     });
 
     require __DIR__ . '/admin-auth.php';
