@@ -51,7 +51,8 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('public/admin/js/common.js') }}"></script>
+    <script src="{{ asset('public/admin/js/common.js') }}"></script>
+
     <script>
         function changeStatus(event, id) {
             let url = "{{ route('admin.categories.change.status') }}" + "/" + id;
@@ -67,23 +68,17 @@
                         $(`.status-${id}`).html("Active");
                         $(`.status-${id}`).addClass("badge-success");
                         $(`.status-${id}`).removeClass("badge-danger");
+                        // show flash message dynamically
                         showFlashMessage('success', response.message || 'Status changed successfully!');
                     } else {
                         $(`.status-${id}`).html("Inactive");
                         $(`.status-${id}`).addClass("badge-danger");
                         $(`.status-${id}`).removeClass("badge-success");
+                        // show flash message dynamically
                         showFlashMessage('success', response.message || 'Status changed successfully!');
                     }
                 }
             });
         }
-
-        // $(document).on("click",".selectItems",function(){
-        //     if($('.selectItems:checked').length > 1){
-        //         $('.mergeIcon').show();
-        //     }else{
-        //         $('.mergeIcon').hide();
-        //     }
-        // });
     </script>
 @endpush

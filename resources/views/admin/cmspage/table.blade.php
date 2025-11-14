@@ -6,6 +6,7 @@
         <thead class="table-secondary">
             <tr>
                 <th class="no-wrap">@sortablelink('id','Sl No.')</th>
+                <th class="no-wrap">Page Slug</th>
                 @foreach (langueses() as $langCode => $language)
                     <th class="no-wrap">Title ({{ $language }})</th>
                 @endforeach
@@ -18,6 +19,7 @@
 
                 <tr class="">
                     <td>{{ $i }}</td>
+                    <td>{{ $item->page_slug }}</td>
                     {{-- // display title for each language --}}
                     @foreach (langueses() as $langCode => $language)
                         <td>{{ $item->translations->where('lang_code', $langCode)->first()->title ?? 'N/A' }}</td>

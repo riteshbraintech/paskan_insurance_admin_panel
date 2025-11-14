@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\BannerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\DashboardController;
@@ -17,6 +19,9 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\CMSController;
+use App\Http\Controllers\Admin\FAQController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserInsuranceFillupController;
 
 Route::prefix('/admin')->group(function () {
     //super admin global
@@ -174,9 +179,60 @@ Route::prefix('/admin')->group(function () {
             Route::get('delete/{id?}', [CategoryFormFieldController::class, 'delete'])->name('admin.categoryformfield.delete');
             Route::get('view/{id?}', [CategoryFormFieldController::class, 'view'])->name('admin.categoryformfield.view');
             Route::get('filter', [CategoryFormFieldController::class, 'filter'])->name('admin.categoryformfield.filter');
-            Route::post('update-sort', [CategoryFormFieldController::class, 'updateSort'])->name('admin.categoryformfield.updateSort');
-        });        
+            Route::post('reorder', [CategoryFormFieldController::class, 'reorder'])->name('admin.categoryformfield.reorder');
 
+        });
+
+
+        // User route
+        Route::group(['prefix'=>'user'],function(){
+            Route::get('/',[UserController::class,'index'])->name('admin.user.index');
+            Route::get('create', [UserController::class, 'create'])->name('admin.user.create');
+            Route::post('store', [UserController::class, 'store'])->name('admin.user.store');
+            Route::post('status/{id?}', [UserController::class, 'changeStatus'])->name('admin.user.change.status');
+            Route::get('edit/{id?}', [UserController::class, 'edit'])->name('admin.user.edit');
+            Route::post('update/{id?}', [UserController::class, 'update'])->name('admin.user.update');
+            Route::get('delete/{id?}', [UserController::class, 'delete'])->name('admin.user.delete');
+            Route::get('view/{id?}', [UserController::class, 'view'])->name('admin.user.view');
+            Route::get('formfieldview/{id?}', [UserController::class, 'formfieldview'])->name('admin.user.formfieldview');
+        });
+
+        //Banner Route
+        Route::group(['prefix'=>'banner'],function(){
+            Route::get('/',[BannerController::class,'index'])->name('admin.banner.index');
+            Route::get('create', [BannerController::class, 'create'])->name('admin.banner.create');
+            Route::post('store', [BannerController::class, 'store'])->name('admin.banner.store');
+            Route::post('status/{id?}', [BannerController::class, 'changeStatus'])->name('admin.banner.change.status');
+            Route::get('edit/{id?}', [BannerController::class, 'edit'])->name('admin.banner.edit');
+            Route::post('update/{id?}', [BannerController::class, 'update'])->name('admin.banner.update');
+            Route::get('delete/{id?}', [BannerController::class, 'delete'])->name('admin.banner.delete');
+            Route::get('view/{id?}', [BannerController::class, 'view'])->name('admin.banner.view');
+        });
+
+        //FAQ Route
+        Route::group(['prefix'=>'faq'],function(){
+            Route::get('/',[FAQController::class,'index'])->name('admin.faq.index');
+            Route::get('create', [FAQController::class, 'create'])->name('admin.faq.create');
+            Route::post('store', [FAQController::class, 'store'])->name('admin.faq.store');
+            Route::post('status/{id?}', [FAQController::class, 'changeStatus'])->name('admin.faq.change.status');
+            Route::get('edit/{id?}', [FAQController::class, 'edit'])->name('admin.faq.edit');
+            Route::post('update/{id?}', [FAQController::class, 'update'])->name('admin.faq.update');
+            Route::get('delete/{id?}', [FAQController::class, 'delete'])->name('admin.faq.delete');
+            Route::get('view/{id?}', [FAQController::class, 'view'])->name('admin.faq.view');
+            Route::post('reorder', [FAQController::class, 'reorder'])->name('admin.faq.reorder');
+        });
+
+        //Article Route
+        Route::group(['prefix'=>'article'],function(){
+            Route::get('/',[ArticleController::class,'index'])->name('admin.article.index');
+            Route::get('create', [ArticleController::class, 'create'])->name('admin.article.create');
+            Route::post('store', [ArticleController::class, 'store'])->name('admin.article.store');
+            Route::post('status/{id?}', [ArticleController::class, 'changeStatus'])->name('admin.article.change.status');
+            Route::get('edit/{id?}', [ArticleController::class, 'edit'])->name('admin.article.edit');
+            Route::post('update/{id?}', [ArticleController::class, 'update'])->name('admin.article.update');
+            Route::get('delete/{id?}', [ArticleController::class, 'delete'])->name('admin.article.delete');
+            Route::get('view/{id?}', [ArticleController::class, 'view'])->name('admin.article.view');
+        });
 
     });
 

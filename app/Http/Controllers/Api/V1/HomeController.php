@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Resources\Api\V1\CategoryResource;
+use App\Models\Banner;
+use App\Models\Categoryformfield;
 use App\Models\CMSPage;
 
 
@@ -146,6 +148,37 @@ class HomeController extends Controller
             200
         );
 
+    }
+
+
+    //get Category Form Fields By slug
+    public function categoryfield($slug){
+        $category = Category::where('slug', $slug)->where('is_active', 1)->first();
+        $formFields = Categoryformfield::with('translation')->where('category_id', $category->id)->orderBy('sort_order', 'asc')->get();
+        
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'Form Fields fetched successfully.',
+                'data' => $formFields ?? null,
+            ],
+            200
+        );
+    }
+
+
+    //get Banner Part
+    public function banner(){
+        $bannerinfo=Banner::with('translation')->where('is_active',1)->orderby('sort_order','asc')->get();
+
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'Banners fetched successfully.',
+                'data' => $bannerinfo ?? null,
+            ],
+            200
+        );
     }
 
 

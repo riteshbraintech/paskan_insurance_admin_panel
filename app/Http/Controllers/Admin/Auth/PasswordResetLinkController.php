@@ -37,7 +37,6 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request)
     {
-        
         // dd(Password::RESET_LINK_SENT);
 
         $request->validate([
@@ -50,7 +49,7 @@ class PasswordResetLinkController extends Controller
        
         try {
                 $res = Admin::where('email', $request->email)->first();
-       
+                // dd($res);
                 if(!empty($res)){
                     $link =  url('admin/reset-password/'. base64_encode($res->id) . '?email='. $request->email);
                     Mail::to($request->email)->send(new AdminResetPassword($link));

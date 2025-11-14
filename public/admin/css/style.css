@@ -1942,3 +1942,4 @@ color: #0c0c2c !important;
 .new-submenu li a{padding: 4px 15px 4px 15px !important; font-size: 12px !important;}
 .new-submenu li a i{font-size: 12px !important;}
 .metismenu .new-submenu:not(.mm-show) {padding-left: 13px;}
+#categoryfilter{border: none;padding: 10px;font-size: 15px;}

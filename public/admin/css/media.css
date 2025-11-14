@@ -1,0 +1,21 @@
+@media (max-width: 1500px) {
+}
+@media (max-width: 1400px) {
+
+}
+@media (max-width: 1300px) {
+    .wifi img{    width: 70px;height: 70px;}
+    .wifi {left: -35px;}
+    .mobile img{    width: 70px;}
+    .login-left-inner {
+    min-width: 480px;
+}
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 992px) {
+}
+@media (max-width: 768px) {
+}
+@media (max-width: 576px) { 
+}

@@ -26,16 +26,6 @@
                             enctype="multipart/form-data">
                             @csrf
 
-                            {{-- @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif --}}
-
                             @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-6">
                                     <label for="title" class="form-label">Title ({{ $language }}) <span
@@ -103,10 +93,6 @@
                             <div class="col-md-12">
                                 <label for="image" class="form-label mt-4">image</label>
                                 <input type="file" name="image" class="form-control" id="image">
-                                {{-- @if (!empty(categories()->user()->image))
-                                    <img src="{{ getImagePath(admin()->user()->image, 'profile') }}" alt=""
-                                        width="54" height="54">
-                                @endif --}}
                             </div>
 
 

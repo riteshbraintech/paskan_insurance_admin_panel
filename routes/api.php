@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\CategoryFormControler;
+use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryControler;
 use App\Http\Controllers\Api\V1\CMSPageControler;
+use App\Http\Controllers\Api\V1\FAQController;
 use App\Http\Controllers\Api\V1\ProfileControler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\HomeController;
-
+use App\Http\Controllers\Api\V1\UserInsuranceFillupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +22,15 @@ use App\Http\Controllers\Api\V1\HomeController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/categoryformfield-list',[CategoryFormControler::class,'index']);
+Route::get('/categoryformfield-list/{label}',[CategoryFormControler::class,'categoryformfieldlist']);
+
+
+Route::get('/categoryformfields/{category_id}',[CategoryFormControler::class,'categoryfields']);
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
 
 // Semi public routes
 Route::prefix('v1')->middleware(['api'])->group(function () {
@@ -26,6 +38,16 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     // public routes here
     Route::get('home', [HomeController::class, 'home']);
     Route::get('header-menu', [HomeController::class, 'headerMenu']);
+    Route::get('category/fields/{slug}',[HomeController::class,'categoryfield']);
+
+    //get FAQ List
+    Route::get('faq',[FAQController::class,'faqlist']);
+
+    //get Article List
+    Route::get('article',[ArticleController::class,'articlelist']);
+
+    //get Banner Data
+    Route::get('banner',[HomeController::class,'banner']);
     
     // global file upload route
     Route::post('uploadSingleFiles', [HomeController::class, 'uploadSingleFiles']);
@@ -38,9 +60,6 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     
     Route::get('/cms-page',[CMSPageControler::class,'index']);
     Route::get('/cms-page/{slug}',[CMSPageControler::class,'cmspagedetail']);
-    
-    Route::get('/category-list',[CategoryControler::class,'index']);
-    Route::get('/category-list/{slug}',[CategoryControler::class,'categorydetail']);
 
 
     // create a prefix for auth routes
