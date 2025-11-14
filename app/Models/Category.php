@@ -47,7 +47,7 @@ class Category extends Model
     public function translation()
     {
         return $this->hasOne(CategoryTranslation::class, 'category_id')
-                    ->where('lang_code', app()->getLocale());
+        ->where('lang_code', app()->getLocale());
     }
 
     

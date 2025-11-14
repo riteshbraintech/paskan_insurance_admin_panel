@@ -1,13 +1,3 @@
-{{-- <style>
-    #sortable tr.ui-state-highlight {
-        background: #ffffff;
-        border: 1px dashed #999;
-    }
-
-    #sortable tr {
-        cursor: move;
-    }
-</style> --}}
 <style>
     #sortable tr.ui-state-highlight {
         background: #f9f9f9;

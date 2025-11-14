@@ -115,7 +115,7 @@
                             <div class="mb-4">
                                 <label>Category Image</label><br>
                                 @if ($record->image)
-                                    <img src="{{ asset('/public/admin/catagories/img/' . $record->image) }}" alt="Category Image" width="120">
+                                    <img src="{{ asset('/public/admin/categories/img/' . $record->image) }}" alt="Category Image" width="120">
                                 @endif
                                 <input type="file" name="image" class="form-control">
                             </div>

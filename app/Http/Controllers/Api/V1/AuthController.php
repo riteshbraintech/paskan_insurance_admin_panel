@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
-class AuthControler extends Controller
+class AuthController extends Controller
 {
     public function register(Request $request){
 
@@ -76,14 +77,9 @@ class AuthControler extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email'    => 'required|email|exists:users,email',
-            'password' => 'required|string|min:6',
+            'id_number'    => 'required|exists:users,id_number'
         ], [
-            'email.required'    => 'Please enter your email address.',
-            'email.email'       => 'Please enter a valid email address.',
-            'email.exists'      => 'No account found with this email.',
-            'password.required' => 'Password is required.',
-            'password.min'      => 'Password must be at least 6 characters long.',
+            'id_number.required'    => 'Please enter your Id Number / Passport Number'
         ]);
 
         if ($validator->fails()) {
@@ -95,14 +91,18 @@ class AuthControler extends Controller
         }
 
         //  2. Attempt login
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('id_number', $request->id_number)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid email or password.',
-            ], 401);
-        }
+         // 2️⃣ Log in via session (creates Sanctum cookie)
+        // Auth::login($user);
+        // $request->session()->regenerate();
+
+        // if (!$user || !Hash::check($request->password, $user->password)) {
+        //     return response()->json([
+        //         'status'  => false,
+        //         'message' => 'Invalid email or password.',
+        //     ], 401);
+        // }
 
         // 3. Check if user is active
         // if ($user->is_active != 1 || $user->status != 'active') {
@@ -119,7 +119,7 @@ class AuthControler extends Controller
             'status'  => true,
             'message' => 'Login successful.',
             'data'    => [
-                'user'  => $user,
+                'user'  => base64_encode(json_encode($user)),
                 'token' => $token,
             ],
         ], 200);

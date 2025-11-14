@@ -40,7 +40,6 @@
             </ul>
         </li> --}}
 
-
         {{-- @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN]))
             
             <li class="{{ $segment == 'client' ? 'mm-active' : '' }}">
@@ -147,25 +146,41 @@
             </li>
         @endif
 
-
-        {{-- <li class="menu-heading-title"><span>Manage Categories</span></li>
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
-            <li class="{{ $segment == 'categories' ? 'mm-active' : '' }}">
-                <a href="{{ route('admin.categories.index') }}">
-                    <i class="fa-solid fa-folder-tree"></i>
-                    <div class="menu-title">Categories</div>
+            <li class="{{ $segment == 'user' ? 'mm-active' : '' }}">
+                <a href="{{ route('admin.user.index') }}">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="menu-title">User Management</div>
                 </a>
             </li>
         @endif
-        
+
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
-            <li class="{{ $segment == 'categoryformfield' ? 'mm-active' : '' }}">
-                <a href="{{ route('admin.categoryformfield.index') }}">
-                    <i class="fa-solid fa-folder-tree"></i>
-                    <div class="menu-title">Category Form Field</div>
+            <li class="{{ $segment == 'banner' ? 'mm-active' : '' }}">
+                <a href="{{ route('admin.banner.index') }}">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="menu-title">Banner Management</div>
                 </a>
             </li>
-        @endif --}}
+        @endif
+
+        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
+            <li class="{{ $segment == 'faq' ? 'mm-active' : '' }}">
+                <a href="{{ route('admin.faq.index') }}">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="menu-title">FAQ Management</div>
+                </a>
+            </li>
+        @endif
+
+        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
+            <li class="{{ $segment == 'article' ? 'mm-active' : '' }}">
+                <a href="{{ route('admin.article.index') }}">
+                    <i class="fa-solid fa-users"></i>
+                    <div class="menu-title">Article Management</div>
+                </a>
+            </li>
+        @endif
 
         {{-- <li class="{{ $segment == 'project' ? 'mm-active' : '' }}">
             <a href="javascript:;" class="has-arrow dropdown">

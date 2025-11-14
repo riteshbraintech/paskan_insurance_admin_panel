@@ -64,7 +64,7 @@ class CategoryController extends Controller
             // --- Image validation ---
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            // ✅ Custom error messages — English
+            // Custom error messages — English
             'trans.en.title.required' => 'The English title is required.',
             'trans.en.title.max' => 'The English title must not exceed 255 characters.',
             'trans.en.description.required' => 'The English description is required.',
@@ -72,7 +72,7 @@ class CategoryController extends Controller
             'trans.en.meta_description.required' => 'The English meta description is required.',
             'trans.en.meta_keywords.required' => 'The English meta keywords are required.',
 
-            // ✅ Custom error messages — Thai
+            // Custom error messages — Thai
             'trans.th.title.required' => 'The Thai title is required.',
             'trans.th.title.max' => 'The Thai title must not exceed 255 characters.',
             'trans.th.description.required' => 'The Thai description is required.',
@@ -80,7 +80,7 @@ class CategoryController extends Controller
             'trans.th.meta_description.required' => 'The Thai meta description is required.',
             'trans.th.meta_keywords.required' => 'The Thai meta keywords are required.',
 
-            // ✅ Optional field message
+            // Optional field message
             'is_active.boolean' => 'The active status must be true or false.',
         ]);
         DB::beginTransaction();
@@ -93,10 +93,9 @@ class CategoryController extends Controller
                 return redirect()->back()->withInput()->with('danger', "English or Thai title is required");
             }
 
-            // ✅ Generate slug
             $slug = Str::slug($englishTitle);
 
-            // ✅ Check if slug already exists in categories table
+            // Check if slug already exists in categories table
             if (\App\Models\Category::where('slug', $slug)->exists()) {
                 return redirect()->back()
                     ->withErrors(['trans.en.title' => 'The slug generated from this English title already exists. Please choose a different title.'])

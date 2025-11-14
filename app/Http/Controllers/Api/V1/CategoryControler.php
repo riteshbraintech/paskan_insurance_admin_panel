@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -10,6 +10,7 @@ class CategoryControler extends Controller
 {
     public function index()
     {
+
         $category = Category::with('translations')->where('is_active', 1)->get();
 
         return response()->json([
