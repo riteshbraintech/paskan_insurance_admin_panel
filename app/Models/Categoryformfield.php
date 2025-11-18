@@ -15,6 +15,35 @@ class Categoryformfield extends Model
     protected $guarded = ['id'];
     public $sortable = ['id', 'label','sort_order','is_required'];
 
+    protected $casts = [
+        'images' => 'array',
+        'options' => 'array',
+    ];
+
+     // create image url accessor
+    public function getImageUrlsAttribute()
+    {
+        $images = $this->images;
+
+        if (is_string($images)) {
+            $images = json_decode($images, true);
+        }
+
+        if (!is_array($images)) {
+            return [];
+        }
+
+        return array_map(function ($img) {
+
+            if (str_starts_with($img, 'http')) {
+                return $img;
+            }
+
+            return asset('public/'.$img);
+
+        }, $images);
+    }
+
 
     public function translations()
     {
@@ -28,7 +57,8 @@ class Categoryformfield extends Model
 
     public function translation()
     {
-        return $this->hasOne(CategoryFieldFormTranslation::class, 'categoryformfield_id')->where('lang_code', app()->getLocale());
+        return $this->hasOne(CategoryFieldFormTranslation::class, 'categoryformfield_id')
+        ->where('lang_code', app()->getLocale());
     }
     
 }

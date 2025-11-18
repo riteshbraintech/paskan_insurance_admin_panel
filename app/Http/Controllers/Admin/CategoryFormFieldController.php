@@ -61,7 +61,6 @@ class CategoryFormFieldController extends Controller
     }
 
 
-
     public function create()
     {
         $categories = Category::with('translations')
@@ -76,83 +75,147 @@ class CategoryFormFieldController extends Controller
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255|unique:categoryformfields,name',
-            'type' => 'required|array|min:1',
+            'type' => 'required|string',
+
+            // Multilingual required fields
             'trans.th.label' => 'required|string',
             'trans.en.label' => 'required|string',
             'trans.th.place_holder' => 'required|string',
             'trans.en.place_holder' => 'required|string',
+
+            // Options (JSON text)
             'trans.th.options' => 'nullable|string',
             'trans.en.options' => 'nullable|string',
-        ], [
-            'category_id.required' => 'Please select a category.',
-            'category_id.exists' => 'Selected category does not exist.',
-            'name.required' => 'The field name is required.',
-            'name.unique' => 'This field name is already taken.',
-            'type.required' => 'Please select a field type.',
-            'trans.th.label.required' => 'Label is required in Thai language.',
-            'trans.en.label.required' => 'Label is required in English language.',
-            'trans.th.place_holder.required' => 'place_holder is required in Thai language.',
-            'trans.en.place_holder.required' => 'place_holder is required in English language.',
-            'trans.th.options.string' => 'Options are required in Thai language.',
-            'trans.en.options.string' => 'Options are required in English language.',
+
+            // Images (one time only)
+            'option_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp',
         ]);
 
         DB::beginTransaction();
         try {
-            // Get last sort order
-            $lastOrder = Categoryformfield::max('sort_order');
+
+            // Compute sort order
+            $lastOrder = CategoryFormField::max('sort_order');
             $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
 
-            $englishLabel = $request->trans['en']['label'] ?? ($request->trans['th']['label'] ?? null);
-            if (is_null($englishLabel)) {
-                return redirect()->back()->withInput()->with('danger', "English or Thai label is required.");
-            }
+            // English fallback
+            $englishLabel = $request->trans['en']['label'] ?? $request->trans['th']['label'];
+            $englishPlaceholder = $request->trans['en']['place_holder'] ?? $request->trans['th']['place_holder'];
 
-            $englishPlaceholder = $request->trans['en']['place_holder'] ?? ($request->trans['th']['place_holder'] ?? null);
-            if (is_null($englishPlaceholder)) {
-                return redirect()->back()->withInput()->with('danger', "English or Thai Place Holder is required.");
-            }
+            // STEP 1: HANDLE OPTIONS
+
+            $optionsPerLang = [];
+            $primaryOptions = [];
+
+            if (in_array($request->type, ['checkbox', 'radio', 'select'])) {
+
+                // Decode options for each language
+                foreach ($request->trans as $lang => $t) {
+                    if (!empty($t['options'])) {
+                        $decoded = json_decode($t['options'], true);
+
+                        if (!is_array($decoded)) {
+                            return back()->withErrors(["trans.$lang.options" => "Invalid JSON in $lang options."]);
+                        }
+
+                        $optionsPerLang[$lang] = json_encode($decoded);
+
+                        // Use English as the master option list
+                        if ($lang === 'en') {
+                            $primaryOptions = $decoded;
+                        }
+                    }
+                }
+
+                // Validate image count matches number of English options
+                $uploadedImages = $request->file('option_images') ?? [];
+
+                if (count($uploadedImages) !== count($primaryOptions)) {
+                    return back()->withErrors([
+                        'option_images' => "Upload exactly " . count($primaryOptions) . " images to match English options."
+                    ]);
+                }
 
             
+                 //STEP 2: UPLOAD IMAGES (only once)
+                $imagePaths = [];
+                $folder = 'admin/option_images/';
 
-            $englishOptionsRaw = $request->trans['en']['options'] ?? ($request->trans['th']['options'] ?? '[]');
+                if ($uploadedImages) {
+                    if (!file_exists(public_path($folder))) {
+                        mkdir(public_path($folder), 0777, true);
+                    }
 
-            // Ensure valid JSON (fallback to empty array if not)
-            $decodedOptions = json_decode($englishOptionsRaw, true);
-            $englishOptions = $decodedOptions !== null ? json_encode($decodedOptions) : json_encode([$englishOptionsRaw]);
+                    foreach ($uploadedImages as $img) {
+                        $fileName = time() . '_' . uniqid() . '_' . str_replace(' ', '_', $img->getClientOriginalName());
+                        $img->move(public_path($folder), $fileName);
+                        $imagePaths[] = $folder . $fileName;
+                    }
+                }
 
-            // Create main field record
-            $field = Categoryformfield::create([
+            } else {
+                // Non-option fields
+                $imagePaths = null;
+            }
+
+            /**
+             * ----------------------------------------------------------
+             * STEP 3: Create main field record
+             * ----------------------------------------------------------
+             */
+
+            $field = CategoryFormField::create([
                 'category_id' => $request->category_id,
                 'label' => $englishLabel,
                 'place_holder' => $englishPlaceholder,
-                'options' => $englishOptions, 
                 'name' => $request->name,
-                'type' => json_encode($request->type), 
+                'type' => $request->type,
+
+                // JSON encode English options (master copy)
+                'options' => !empty($primaryOptions) ? json_encode($primaryOptions) : null,
+
+                // images uploaded once
+                // 'images' => $imagePaths ? json_encode($imagePaths) : null,
+                'images' => $imagePaths ?: null,
+
+
                 'is_required' => $request->has('is_required'),
                 'sort_order' => $newSortOrder,
             ]);
 
-            // Create translations
-            foreach ($request->trans as $langCode => $translation) {
-                $optionsJson = json_decode($translation['options'] ?? '', true);
+            /**
+             * ----------------------------------------------------------
+             * STEP 4: Create translations (no images here)
+             * ----------------------------------------------------------
+             */
+
+            foreach ($request->trans as $lang => $data) {
                 CategoryFieldFormTranslation::create([
                     'categoryformfield_id' => $field->id,
-                    'lang_code' => $langCode,
-                    'label' => $translation['label'] ?? '',
-                    'place_holder' => $translation['place_holder'] ?? '',
-                    'options' => $translation['options'] ? json_encode(json_decode($translation['options'], true) ?? [$translation['options']]) : json_encode([]),
+                    'lang_code' => $lang,
+                    'label' => $data['label'],
+                    'place_holder' => $data['place_holder'],
+                    'options' => $data['options'] ?? null,
                 ]);
             }
 
             DB::commit();
-            return redirect()->route('admin.categoryformfield.index')->with('success', 'Field created successfully.');
+
+            return redirect()
+                ->route('admin.categoryformfield.index')
+                ->with('success', 'Field created successfully.');
+
         } catch (\Throwable $th) {
+
             DB::rollBack();
-            \Log::alert("CategoryFormFieldController - Store Function : " . $th->getMessage());
-            return redirect()->route('admin.categoryformfield.index')->with('danger', "Something went wrong");
+            \Log::alert("Error in Store: " . $th->getMessage());
+
+            return redirect()
+                ->route('admin.categoryformfield.index')
+                ->with('danger', 'Something went wrong');
         }
     }
+
 
     public function changeStatus($id)
     {
@@ -190,6 +253,7 @@ class CategoryFormFieldController extends Controller
                 'label' => $item->label,
                 'place_holder' => $item->place_holder,
                 'options' => $item->options ? json_encode(json_decode($item->options, true), JSON_UNESCAPED_UNICODE) : '',
+                'images' => $item->images ? json_encode(json_decode($item->images, true), JSON_UNESCAPED_UNICODE) : '',
                 ]];
         });
         $categories = Category::with('translations')->get();
@@ -199,76 +263,153 @@ class CategoryFormFieldController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|array|min:1',
+            'type' => 'required|string',
             'sort_order' => 'nullable|integer',
             'is_required' => 'nullable|boolean',
 
-            // --- English ---
+            // English
             'trans.en.label' => 'required|string|max:255',
             'trans.en.place_holder' => 'required|string|max:255',
             'trans.en.options' => 'nullable|string',
 
-            // --- Thai ---
+            // Thai
             'trans.th.label' => 'required|string|max:255',
             'trans.th.place_holder' => 'required|string|max:255',
             'trans.th.options' => 'nullable|string',
-        ], [
-            'name.required' => 'The field name is required.',
-            'type.required' => 'The field type is required.',
-            'trans.en.label.required' => 'The English label is required.',
-            'trans.th.label.required' => 'The Thai label is required.',
-            'trans.en.place_holder.required' => 'The English Placeholder is required.',
-            'trans.th.place_holder.required' => 'The Thai Placeholder is required.',
         ]);
 
         DB::beginTransaction();
-
         try {
-            $record = Categoryformfield::findOrFail($id);
 
-            // Pick English (or fallback) for main label/options
-            $englishLabel = $validatedData['trans']['en']['label'] ?? ($validatedData['trans']['th']['label'] ?? '');
-            $englishPlaceholder = $validatedData['trans']['en']['place_holder'] ?? ($validatedData['trans']['th']['place_holder'] ?? '');
-            $englishOptions = $validatedData['trans']['en']['options'] ?? ($validatedData['trans']['th']['options'] ?? '');
+            $field = CategoryFormField::findOrFail($id);
 
-            // Update single-language fields (main table)
-            $record->update([
-                'name' => $validatedData['name'],
-                'type' => json_encode($validatedData['type']),
-                // 'sort_order' => $validatedData['sort_order'] ?? 0,
-                'label' => $englishLabel,
-                'place_holder' => $englishPlaceholder,
-                'options' => $englishOptions,
+            // ---------------------- PRIMARY OPTIONS ----------------------
+            $primaryOptions = [];
+
+            if (in_array($request->type, ['select', 'checkbox', 'radio'])) {
+
+                $raw = $request->trans['en']['options'] ?? '';
+
+                if (is_string($raw)) {
+
+                    // 1. Try decode JSON
+                    $decoded = json_decode($raw, true);
+
+                    if (is_array($decoded)) {
+                        $primaryOptions = $decoded;
+                    } else {
+                        // 2. Convert CSV → array
+                        $primaryOptions = array_filter(
+                            array_map('trim', explode(',', $raw))
+                        );
+                    }
+                }
+
+                if (!is_array($primaryOptions)) {
+                    $primaryOptions = [];
+                }
+            }
+
+            // ---------------------- LOAD OLD IMAGES ----------------------
+            $images = $field->images;
+
+            if (is_string($images)) {
+                $images = json_decode($images, true);
+            }
+
+            $images = $images ?? [];
+
+
+            // ---------------------- REMOVE IMAGES ----------------------
+            foreach ($request->remove_images ?? [] as $removeImg) {
+                $key = array_search($removeImg, $images);
+
+                if ($key !== false) {
+                    unset($images[$key]);
+                    @unlink(public_path($removeImg));
+                }
+            }
+
+            $images = array_values($images);
+
+            // ---------------------- UPLOAD NEW IMAGES ----------------------
+            if ($request->hasFile('option_images')) {
+
+                $folder = 'admin/option_images/';
+
+                if (!file_exists(public_path($folder))) {
+                    mkdir(public_path($folder), 0777, true);
+                }
+
+                foreach ($request->file('option_images') as $img) {
+                    $name = time() . '_' . uniqid() . '_' . str_replace(' ', '_', $img->getClientOriginalName());
+                    $img->move(public_path($folder), $name);
+                    $images[] = $folder . $name;
+                }
+            }
+
+            // ---------------------- UPDATE MAIN RECORD ----------------------
+            $field->update([
+                'label' => $request->trans['en']['label'],
+                'place_holder' => $request->trans['en']['place_holder'],
+                'name' => $request->name,
+                'type' => $request->type,
+                'options' => json_encode($primaryOptions),
+                'images' => json_encode($images),
             ]);
 
-            // Update or create translations
-            foreach ($validatedData['trans'] as $langCode => $translationData) {
-            $record->translations()->updateOrCreate(
-                ['lang_code' => $langCode],
-                [
-                    'label' => $translationData['label'],
-                    'place_holder' => $translationData['place_holder'],
-                    'options' => $translationData['options']
-                        ? json_encode(json_decode($translationData['options'], true) ?? [$translationData['options']])
-                        : json_encode([]),
-                ]
-            );
+
+            // ---------------------- UPDATE TRANSLATIONS ----------------------
+            foreach ($request->trans as $lang => $translation) {
+
+                $options = $translation['options'] ?? '';
+
+                if (is_string($options)) {
+
+                    // Try decode JSON
+                    $decoded = json_decode($options, true);
+
+                    if (is_array($decoded)) {
+                        $options = $decoded;
+                    } else {
+                        // Convert CSV → array
+                        $options = array_filter(
+                            array_map('trim', explode(',', $options))
+                        );
+                    }
+                }
+
+                if (!is_array($options)) {
+                    $options = [];
+                }
+
+                CategoryFieldFormTranslation::updateOrCreate(
+                    [
+                        'categoryformfield_id' => $field->id,
+                        'lang_code' => $lang,
+                    ],
+                    [
+                        'label' => $translation['label'] ?? null,
+                        'place_holder' => $translation['place_holder'] ?? null,
+                        'options' => json_encode($options),
+                    ]
+                );
             }
 
             DB::commit();
 
-            return redirect()->route('admin.categoryformfield.index')->with('success', 'Category form field updated successfully.');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            \Log::error('Category Form Field Update Error: ' . $e->getMessage());
-
             return redirect()
-                ->back()
-                ->withInput()
-                ->with('danger', 'Something went wrong while updating the category form field.');
+                ->route('admin.categoryformfield.index')
+                ->with('success', 'Field updated successfully.');
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+            \Log::error("CategoryFormField Update Error: " . $th->getMessage());
+
+            return back()->with('danger', 'Something went wrong.');
         }
     }
 
@@ -276,9 +417,24 @@ class CategoryFormFieldController extends Controller
 
     public function delete($id)
     {
-        Categoryformfield::findOrFail($id)->delete();
+        $field = CategoryFormField::findOrFail($id);
+
+        // Check if there are images to delete
+        if (!empty($field->images)) {
+            // Decode the images (assuming they are stored as JSON in the database)
+            $images = json_decode($field->images, true);
+
+            foreach ($images as $image) {
+                $imagePath = public_path($image);  // Get the full path to the image
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);  
+                }
+            }
+        }
+        $field->delete();
         return redirect()->route('admin.categoryformfield.index')->with('success', 'Category Form Fields Removed');
     }
+
 
     public function view($id)
     {

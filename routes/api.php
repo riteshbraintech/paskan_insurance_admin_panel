@@ -40,6 +40,7 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     Route::get('header-menu', [HomeController::class, 'headerMenu']);
     Route::get('category/fields/{slug}',[HomeController::class,'categoryfield']);
 
+
     //get FAQ List
     Route::get('faq',[FAQController::class,'faqlist']);
 
@@ -48,6 +49,10 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
 
     //get Banner Data
     Route::get('banner',[HomeController::class,'banner']);
+
+    
+    //get form field image with option
+    Route::get('optionimage/{id}',[HomeController::class,'show']);
     
     // global file upload route
     Route::post('uploadSingleFiles', [HomeController::class, 'uploadSingleFiles']);

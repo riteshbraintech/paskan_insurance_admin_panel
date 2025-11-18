@@ -8,11 +8,13 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.categoryformfield.index') }}"><i
-                                class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active"><a href="{{ route('admin.categoryformfield.index') }}">Category form
-                            Field Pages</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit Category Form Field</li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('admin.categoryformfield.index') }}"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('admin.categoryformfield.index') }}">Category Form Fields</a>
+                    </li>
+                    <li class="breadcrumb-item active">Edit</li>
                 </ol>
             </nav>
         </div>
@@ -25,188 +27,207 @@
                     <div class="p-4 border rounded">
 
                         <form action="{{ route('admin.categoryformfield.update', $record->id) }}" method="POST"
-                            class="row g-3 needs-validation" enctype="multipart/form-data">
+                            enctype="multipart/form-data" class="row g-3">
+
                             @csrf
-                            {{-- @method('PUT') --}}
 
-                            {{-- Category --}}
-                            {{-- <div class="col-md-12">
-                                <label class="form-label">Select Category <span class="text-danger">*</span></label>
-                                <select name="category_id" class="form-control" required>
-                                    <option value="">-- Select Category --</option>
-                                    @foreach ($categories as $category)
-                                        @php
-                                            $lang = app()->getLocale() ?? 'en';
-                                            $translation =
-                                                $category->translations->where('lang_code', $lang)->first() ??
-                                                $category->translations->first();
-                                            $categoryName = $translation->title ?? ($category->title ?? 'Unnamed');
-                                        @endphp
-                                        <option value="{{ $category->id }}"
-                                            {{ $record->category_id == $category->id ? 'selected' : '' }}>
-                                            {{ $categoryName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div> --}}
-
-                            {{-- Multilingual Title --}}
-                            @foreach (langueses() as $langCode => $language)
-                                @php
-                                    $labelValue = old("trans.$langCode.label", $translations[$langCode]['label'] ?? '');
-                                    $idValue = $translations[$langCode]['id'] ?? '';
-                                @endphp
-
-                                <input type="hidden" name="trans[{{ $langCode }}][id]" class="form-control"
-                                    value="{{ $idValue }}" />
+                            {{-- ==================== LABEL (MULTI-LANG) ==================== --}}
+                            @foreach (langueses() as $lang => $language)
+                                <input type="hidden" name="trans[{{ $lang }}][id]"
+                                    value="{{ $translations[$lang]['id'] ?? '' }}">
 
                                 <div class="col-md-6">
                                     <label class="form-label">Label ({{ $language }}) <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" name="trans[{{ $langCode }}][label]" class="form-control"
-                                        value="{{ $labelValue }}" placeholder="Enter Label in {{ $language }}">
-                                    @error("trans.$langCode.label")
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
+                                    <input type="text" class="form-control" name="trans[{{ $lang }}][label]"
+                                        value="{{ old("trans.$lang.label", $translations[$lang]['label'] ?? '') }}">
                                 </div>
                             @endforeach
 
-                            @foreach (langueses() as $langCode => $language)
-                                @php
-                                    $placeholderValue = old(
-                                        "trans.$langCode.place_holder",
-                                        $translations[$langCode]['place_holder'] ?? '',
-                                    );
-                                @endphp
-                                <div class="col-md-12">
-                                    <label class="form-label">Place Holder ({{ $language }})</label>
-                                    <textarea name="trans[{{ $langCode }}][place_holder]" id="trans_{{ $langCode }}_place_holder"
-                                        class="form-control" rows="2">{{ $placeholderValue }}</textarea>
-                                    @error("trans.$langCode.place_holder")
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
+
+                            {{-- ==================== PLACEHOLDER (MULTI-LANG) ==================== --}}
+                            @foreach (langueses() as $lang => $language)
+                                <div class="col-md-6">
+                                    <label class="form-label">Placeholder ({{ $language }})</label>
+                                    <input type="text" class="form-control"
+                                        name="trans[{{ $lang }}][place_holder]"
+                                        value="{{ old("trans.$lang.place_holder", $translations[$lang]['place_holder'] ?? '') }}">
                                 </div>
                             @endforeach
 
-                            {{-- Single-language fields --}}
+
+                            {{-- ==================== FIELD NAME ==================== --}}
                             <div class="col-md-4">
                                 <label class="form-label">Field Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control"
+                                <input type="text" class="form-control" name="name"
                                     value="{{ old('name', $record->name) }}">
                             </div>
 
-                            @php
-                                // Decode stored JSON field type
-                                $storedTypes = json_decode($record->type, true) ?? [];
-                                $oldTypes = old('type', $storedTypes);
-                            @endphp
 
+                            {{-- ==================== FIELD TYPE ==================== --}}
                             <div class="col-md-4">
-                                <label for="type" class="form-label">
-                                    Field Type <span class="text-danger">*</span>
-                                </label>
-
-                                <select name="type[]" id="type" class="form-select" multiple>
-                                    <option value="text" {{ in_array('text', $oldTypes) ? 'selected' : '' }}>Text
+                                <label class="form-label">Field Type <span class="text-danger">*</span></label>
+                                <select name="type" id="type" class="form-control">
+                                    <option value="text" {{ $record->type == 'text' ? 'selected' : '' }}>Text</option>
+                                    <option value="number" {{ $record->type == 'number' ? 'selected' : '' }}>Number
                                     </option>
-                                    <option value="number" {{ in_array('number', $oldTypes) ? 'selected' : '' }}>Number
+                                    <option value="select" {{ $record->type == 'select' ? 'selected' : '' }}>Select
                                     </option>
-                                    <option value="select" {{ in_array('select', $oldTypes) ? 'selected' : '' }}>Select
+                                    <option value="checkbox" {{ $record->type == 'checkbox' ? 'selected' : '' }}>Checkbox
                                     </option>
-                                    <option value="checkbox" {{ in_array('checkbox', $oldTypes) ? 'selected' : '' }}>
-                                        Checkbox</option>
-                                    <option value="radio" {{ in_array('radio', $oldTypes) ? 'selected' : '' }}>Radio
+                                    <option value="radio" {{ $record->type == 'radio' ? 'selected' : '' }}>Radio</option>
+                                    <option value="textarea" {{ $record->type == 'textarea' ? 'selected' : '' }}>Textarea
                                     </option>
-                                    <option value="textarea" {{ in_array('textarea', $oldTypes) ? 'selected' : '' }}>
-                                        Textarea</option>
                                 </select>
-
-                                @error('type')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
                             </div>
 
 
-                            {{-- <div class="col-md-4">
-                                <label class="form-label">Sort Order</label>
-                                <input type="number" name="sort_order" class="form-control"
-                                    value="{{ old('sort_order', $record->sort_order ?? 0) }}">
-                            </div> --}}
-
-
-                            {{-- Multilingual Options (for select/radio/checkbox) --}}
-                            @foreach (langueses() as $langCode => $language)
-                                @php
-                                    $optionsValue = old(
-                                        "trans.$langCode.options",
-                                        $translations[$langCode]['options'] ?? '',
-                                    );
-                                @endphp
-                                <div class="col-md-12 options-group">
-                                    <label class="form-label">Options ({{ $language }})</label>
-                                    <textarea name="trans[{{ $langCode }}][options]" id="trans_{{ $langCode }}_options" class="form-control"
-                                        rows="2">{{ $optionsValue }}</textarea>
-                                    @error("trans.$langCode.options")
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            @endforeach
-
-
-
-
-                            <div class="col-12">
-                                <div class="row row-cols-auto g-3">
-                                    <div class="col">
-                                        <button type="submit" class="btn btn-success px-5 radius-30">Update</button>
+                            {{-- ==================== OPTIONS (MULTI-LANG) ==================== --}}
+                            <div id="textOptionsWrapper" class="col-md-12" style="display:none;">
+                                @foreach (langueses() as $lang => $language)
+                                    <div class="mb-3">
+                                        <label class="form-label">Options ({{ $language }}) </label>
+                                        <textarea name="trans[{{ $lang }}][options]" class="form-control">{{ old("trans.$lang.options", $translations[$lang]['options'] ?? '') }}</textarea>
                                     </div>
-                                    <div class="col">
-                                        <a href="{{ route('admin.categoryformfield.index') }}"
-                                            class="btn btn-outline-secondary px-5 radius-30">Back</a>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
+
+
+                            {{-- ==================== IMAGE OPTIONS ==================== --}}
+                            <div id="imageOptionsWrapper" class="col-md-12" style="display:none;">
+                                <label class="form-label">Upload Option Images</label>
+                                <input type="file" name="option_images[]" multiple class="form-control mb-2"
+                                    id="optionImagesInput">
+
+                                <small class="text-muted">
+                                    The number of images must match number of options (primary language).
+                                </small>
+
+                                {{-- NEW PREVIEWS --}}
+                                <div id="imagePreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+
+
+                                {{-- EXISTING IMAGES --}}
+                                @if (!empty($record->images))
+                                    @php
+                                        $images = json_decode($record->images, true);
+                                    @endphp
+
+                                    <div class="d-flex flex-wrap gap-2 mt-2" id="existingImages">
+                                        @foreach ($images as $img)
+                                            <div class="position-relative image-box">
+                                                <img src="{{ asset('public/' . $img) }}" class="img-thumbnail"
+                                                    style="width:80px;height:80px;object-fit:cover;">
+
+                                                <button type="button" class="remove-existing-image btn btn-danger btn-sm"
+                                                    data-img="{{ $img }}"
+                                                    style="position:absolute; top:-8px; right:-8px; border-radius:50%; padding:2px 6px;">
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <button class="btn btn-success px-5">Update</button>
+                                <a href="{{ route('admin.categoryformfield.index') }}"
+                                    class="btn btn-secondary px-5">Back</a>
+                            </div>
+
                         </form>
+
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 @endsection
+
+
 @push('scripts')
-    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            @foreach (langueses() as $langCode => $language)
-                ClassicEditor
-                    .create(document.querySelector('#trans_{{ $langCode }}_description'))
-                    .catch(error => console.error(error));
-            @endforeach
-        });
-    </script> --}}
+        $(document).ready(function() {
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+            function toggleFields() {
+                const type = $('#type').val();
 
-        <script>
-            $(document).ready(function() {
-                $('#type').select2({
-                    placeholder: "Select field types",
-                    width: '100%'
+                $('#textOptionsWrapper').hide();
+                $('#imageOptionsWrapper').hide();
+
+                if (['select', 'radio', 'checkbox'].includes(type)) {
+                    $('#textOptionsWrapper').show();
+                    $('#imageOptionsWrapper').show();
+                }
+            }
+
+            $('#type').on('change', toggleFields);
+            toggleFields();
+
+
+            // -------------------- New Image Preview --------------------
+            let selectedFiles = [];
+
+            $('#optionImagesInput').on('change', function(e) {
+                const files = Array.from(e.target.files);
+
+                files.forEach(file => {
+                    selectedFiles.push(file);
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const wrapper = $(`
+                    <div class="position-relative image-box">
+                        <img src="${event.target.result}"
+                             class="img-thumbnail"
+                             style="width:80px;height:80px;object-fit:cover;">
+                        <button type="button" class="remove-new-image btn btn-danger btn-sm"
+                                style="position:absolute; top:-8px; right:-8px; border-radius:50%; padding:2px 6px;">
+                            &times;
+                        </button>
+                    </div>
+                `);
+
+                        wrapper.find('.remove-new-image').click(function() {
+                            const index = wrapper.index();
+                            selectedFiles.splice(index, 1);
+                            updateFileInput();
+                            wrapper.remove();
+                        });
+
+                        $('#imagePreview').append(wrapper);
+                    };
+                    reader.readAsDataURL(file);
                 });
 
-                function toggleOptions() {
-                    const types = $('#type').val() || [];
-                    if (types.includes('select') || types.includes('radio') || types.includes('checkbox')) {
-                        $('.options-group').show();
-                    } else {
-                        $('.options-group').hide();
-                    }
-                }
-
-                toggleOptions();
-                $('#type').on('change', toggleOptions);
+                updateFileInput();
             });
-        </script>
-    @endpush
+
+            function updateFileInput() {
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                document.getElementById('optionImagesInput').files = dt.files;
+            }
+
+
+            // -------------------- Delete Existing Image --------------------
+            $(document).on('click', '.remove-existing-image', function() {
+                const imgPath = $(this).data('img');
+
+                // Add hidden input for backend to delete
+                $('<input>', {
+                    type: 'hidden',
+                    name: 'remove_images[]',
+                    value: imgPath
+                }).appendTo('form');
+
+                $(this).closest('.image-box').remove();
+            });
+
+
+        });
+    </script>
+@endpush
