@@ -51,7 +51,7 @@
                     @php
                         $englishTitle = optional($item->category?->translations->where('lang_code', 'en')->first())
                             ->title;
-                        $defaultTitle = $item->category?->title ?? 'Unnamed';
+                        $defaultTitle = $item->category?->title ?? '';
                     @endphp
                     <td>{{ $englishTitle ?? $defaultTitle }}</td>
 

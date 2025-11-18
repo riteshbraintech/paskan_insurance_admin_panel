@@ -158,7 +158,7 @@
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'banner' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.banner.index') }}">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-image"></i>
                     <div class="menu-title">Banner Management</div>
                 </a>
             </li>
@@ -167,7 +167,7 @@
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'faq' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.faq.index') }}">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-circle-question"></i>
                     <div class="menu-title">FAQ Management</div>
                 </a>
             </li>
@@ -176,7 +176,7 @@
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'article' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.article.index') }}">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-file-lines"></i>
                     <div class="menu-title">Article Management</div>
                 </a>
             </li>

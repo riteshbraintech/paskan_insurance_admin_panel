@@ -99,6 +99,10 @@ class CategoryFormFieldController extends Controller
 
         DB::beginTransaction();
         try {
+            // Get last sort order
+            $lastOrder = Categoryformfield::max('sort_order');
+            $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
+
             $englishLabel = $request->trans['en']['label'] ?? ($request->trans['th']['label'] ?? null);
             if (is_null($englishLabel)) {
                 return redirect()->back()->withInput()->with('danger', "English or Thai label is required.");
@@ -126,6 +130,7 @@ class CategoryFormFieldController extends Controller
                 'name' => $request->name,
                 'type' => json_encode($request->type), 
                 'is_required' => $request->has('is_required'),
+                'sort_order' => $newSortOrder,
             ]);
 
             // Create translations
@@ -168,7 +173,7 @@ class CategoryFormFieldController extends Controller
         return response()->json([
             'success' => true,
             'status' => $status,
-            'message' => "Status changed to {$status} successfully!"
+            'message' => "Category Form Field Status changed to {$status} successfully!"
         ]);
     }
 
