@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\v1\BannerResource;
+use App\Http\Resources\Api\V1\BannerResource;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Resources\Api\V1\CategoryResource;
 use App\Models\Banner;
 use App\Models\Categoryformfield;
 use App\Models\CMSPage;
-use App\Http\Resources\Api\v1\CategoryFieldResource;
+use App\Http\Resources\Api\V1\CategoryFieldResource;
 
 
 
