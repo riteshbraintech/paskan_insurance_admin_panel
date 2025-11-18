@@ -16,18 +16,10 @@ class BannerResource extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'title'          => $this->title,
+            'title'         => $this->translation->title ?? $this->title,
+            'description'  => $this->translation->description ?? '',
             'sort_order'    => $this->sort_order,
-
             'image_url'   => $this->image_url ?? null,
-
-
-            'translation' => $this->whenLoaded('translation', function () {
-                return [
-                    'title'         => $this->translation->title ?? '',
-                    'description'  => $this->translation->description ?? '',
-                ];
-            }),
         ];
     }
 }
