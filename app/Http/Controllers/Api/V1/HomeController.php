@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\v1\BannerResource;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Resources\Api\V1\CategoryResource;
 use App\Models\Banner;
 use App\Models\Categoryformfield;
 use App\Models\CMSPage;
+use App\Http\Resources\Api\v1\CategoryFieldResource;
 
 
 
@@ -36,13 +38,14 @@ class HomeController extends Controller
             ->get();
 
             
-        $banners = []; // Fetch banners as needed
+        $banners = Banner::with('translation')->where('is_active',1)->orderby('sort_order','asc')->get();
+         // Fetch banners as needed
         $testimonials = []; // Fetch testimonials as needed
         $insurances = []; // Fetch insurances as needed
 
         
         $payload = [
-            'banners' => $banners,
+            'banners' => BannerResource::collection($banners),
             'topcategories' => CategoryResource::collection($topcategories),
             'categories' => CategoryResource::collection($randomCategories),
             'testimonials' => $testimonials,
@@ -152,35 +155,87 @@ class HomeController extends Controller
 
 
     //get Category Form Fields By slug
-    public function categoryfield($slug){
-        $category = Category::where('slug', $slug)->where('is_active', 1)->first();
-        $formFields = Categoryformfield::with('translation')->where('category_id', $category->id)->orderBy('sort_order', 'asc')->get();
+    // public function categoryfield($slug){
+    //     $category = Category::where('slug', $slug)->where('is_active', 1)->first();
+    //     $formFields = Categoryformfield::with('translation')->where('category_id', $category->id)->orderBy('sort_order', 'asc')->get();
         
-        return response()->json(
-            [
-                'status' => 'success',
-                'message' => 'Form Fields fetched successfully.',
-                'data' => $formFields ?? null,
-            ],
-            200
-        );
+    //     return response()->json(
+    //         [
+    //             'status' => 'success',
+    //             'message' => 'Form Fields fetched successfully.',
+    //             'data' => $formFields ?? null,
+    //         ],
+    //         200
+    //     );
+    // }
+
+    public function categoryfield($slug)
+    {
+        $category = Category::where('slug', $slug)
+            ->where('is_active', 1)
+            ->firstOrFail();
+
+        $formFields = Categoryformfield::with('translation')
+            ->where('category_id', $category->id)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Form Fields fetched successfully.',
+            'data'    => CategoryFieldResource::collection($formFields),
+        ]);
     }
+
 
 
     //get Banner Part
-    public function banner(){
-        $bannerinfo=Banner::with('translation')->where('is_active',1)->orderby('sort_order','asc')->get();
+    // public function banner(){
+    //     $bannerinfo=Banner::with('translation')->where('is_active',1)->orderby('sort_order','asc')->get();
 
-        return response()->json(
-            [
-                'status' => 'success',
-                'message' => 'Banners fetched successfully.',
-                'data' => $bannerinfo ?? null,
-            ],
-            200
-        );
+    //     return response()->json(
+    //         [
+    //             'status' => 'success',
+    //             'message' => 'Banners fetched successfully.',
+    //             'data' => $bannerinfo ?? null,
+    //         ],
+    //         200
+    //     );
+    // }
+
+
+    public function show($id)
+    {
+        // Load field + translations
+        $field=Categoryformfield::with('translations')->findOrFail($id);
+
+        // Primary English options (values)
+        $primaryOptions = json_decode($field->options, true) ?? [];
+
+        // Images (shared)
+        $images = json_decode($field->images, true) ?? [];
+
+        // Translation options (labels)
+        $translatedOptions = json_decode(optional($field->translations->first())->options, true)
+                            ?? $primaryOptions;
+
+        // Build final array
+        $output = [];
+        foreach ($primaryOptions as $index => $val) {
+            $output[] = [
+                "label" => $translatedOptions[$index] ?? $val,
+                "value" => $val,
+                "image" => isset($images[$index]) 
+                            ? asset($images[$index])
+                            : null
+            ];
+        }
+
+        return response()->json([
+            "field_id" => $field->id,
+            "type"     => $field->type,
+            "options"  => $output
+        ]);
     }
-
-
 
 }

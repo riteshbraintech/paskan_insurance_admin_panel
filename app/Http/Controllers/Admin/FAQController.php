@@ -72,6 +72,10 @@ class FAQController extends Controller
         DB::beginTransaction();
 
         try {
+            // Get last sort order
+            $lastOrder = FAQ::max('sort_order');
+            $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
+
             // pick English or Thai title
             $englishTitle = $request->trans['en']['title'] ?? ($request->trans['th']['title'] ?? "hello");
 
@@ -91,6 +95,7 @@ class FAQController extends Controller
                 'title' => $englishTitle,
                 'slug' => "",
                 'is_published' => $request->is_published ?? 1,
+                'sort_order' => $newSortOrder,
             ]);
 
             // save translations

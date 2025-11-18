@@ -123,8 +123,6 @@
                         });
                     });
 
-                    // console.log('Sending new order:', order);
-
                     $.ajax({
                         url: "{{ route('admin.categoryformfield.reorder') }}",
                         type: "POST",

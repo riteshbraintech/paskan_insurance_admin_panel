@@ -36,10 +36,8 @@
                                             // Detect current language (or set default)
                                             $lang = app()->getLocale() ?? 'en';
 
-                                            // Try to fetch translation for the current language
                                             $translation = $category->translations->where('lang_code', $lang)->first();
 
-                                            // If not found, fall back to the first translation available
                                             if (!$translation) {
                                                 $translation = $category->translations->first();
                                             }
@@ -73,7 +71,6 @@
                                 </div>
                             @endforeach
 
-
                             @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-6">
                                     <label for="place_holder_{{ $langCode }}" class="form-label">Place Holder
@@ -91,16 +88,6 @@
                                 </div>
                             @endforeach
 
-                            {{-- Multiple Select Checkbox --}}
-                            {{-- <div class="col-md-12 mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="is_multiple" id="is_multiple"
-                                        value="1" {{ old('is_multiple') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_multiple">
-                                        Multiple Select
-                                    </label>
-                                </div>
-                            </div> --}}
 
                             {{-- Field info --}}
                             <div class="col-md-4">
@@ -121,20 +108,16 @@
                                     Field Type <span class="text-danger">*</span>
                                 </label>
 
-                                {{-- Dropdown-style multiselect --}}
-                                <select name="type[]" id="type" class="form-select" multiple>
-                                    <option value="text" {{ in_array('text', $oldTypes) ? 'selected' : '' }}>Text
+                                <select name="type" id="type" class="form-select">
+                                    <option value="">-- Select Type --</option>
+                                    <option value="text" {{ old('type') == 'text' ? 'selected' : '' }}>Text</option>
+                                    <option value="number" {{ old('type') == 'number' ? 'selected' : '' }}>Number</option>
+                                    <option value="select" {{ old('type') == 'select' ? 'selected' : '' }}>Select</option>
+                                    <option value="checkbox" {{ old('type') == 'checkbox' ? 'selected' : '' }}>Checkbox
                                     </option>
-                                    <option value="number" {{ in_array('number', $oldTypes) ? 'selected' : '' }}>Number
+                                    <option value="radio" {{ old('type') == 'radio' ? 'selected' : '' }}>Radio</option>
+                                    <option value="textarea" {{ old('type') == 'textarea' ? 'selected' : '' }}>Textarea
                                     </option>
-                                    <option value="select" {{ in_array('select', $oldTypes) ? 'selected' : '' }}>Select
-                                    </option>
-                                    <option value="checkbox" {{ in_array('checkbox', $oldTypes) ? 'selected' : '' }}>
-                                        Checkbox</option>
-                                    <option value="radio" {{ in_array('radio', $oldTypes) ? 'selected' : '' }}>Radio
-                                    </option>
-                                    <option value="textarea" {{ in_array('textarea', $oldTypes) ? 'selected' : '' }}>
-                                        Textarea</option>
                                 </select>
 
                                 @error('type')
@@ -142,29 +125,43 @@
                                 @enderror
                             </div>
 
-                            {{-- <div class="col-md-4">
-                                <label for="sort_order" class="form-label">Sort Order</label>
-                                <input type="number" name="sort_order" class="form-control" id="sort_order"
-                                    value="{{ old('sort_order', 0) }}">
-                            </div> --}}
-
-                            {{-- Options per language (for select/radio/checkbox) --}}
-                            <div class="options-wrapper">
+                            {{-- MULTILINGUAL OPTIONS --}}
+                            <div id="textOptionsWrapper" class="options-wrapper" style="display:none;">
                                 @foreach (langueses() as $langCode => $language)
                                     <div class="col-md-12 mb-3">
+
                                         <label for="options_{{ $langCode }}" class="form-label">
                                             Options ({{ $language }})
                                         </label>
+
                                         <textarea name="trans[{{ $langCode }}][options]" id="options_{{ $langCode }}" class="form-control"
-                                            rows="2" placeholder='["Option1","Option2"]'>{{ old('trans.' . $langCode . '.options') }}</textarea>
+                                            rows="2" placeholder='["Red", "Blue"]'>{{ old('trans.' . $langCode . '.options') }}</textarea>
 
                                         @if ($errors->has('trans.' . $langCode . '.options'))
                                             <div class="text-danger">
                                                 {{ $errors->first('trans.' . $langCode . '.options') }}</div>
                                         @endif
+
                                     </div>
                                 @endforeach
                             </div>
+
+                            {{-- ONE IMAGE UPLOAD FOR ALL LANGUAGES --}}
+                            <div id="imageOptionsWrapper" style="display:none;">
+                                <label class="form-label">Upload Images For Options (All Languages)</label>
+                                <input type="file" name="option_images[]" class="form-control mb-2" multiple
+                                    id="optionImagesInput">
+
+                                <small class="text-muted">
+                                    Upload images once. Same images apply to all languages.
+                                    Number of images must match number of options in primary language.
+                                </small>
+
+                                {{-- Preview container --}}
+                                <div id="imagePreview" class="mt-3 d-flex flex-wrap gap-2"></div>
+                            </div>
+
+
 
                             {{-- Buttons --}}
                             <div class="col-12">
@@ -195,31 +192,82 @@
                 const types = $('#type').val();
                 if (types && (types.includes('select') || types.includes('radio') || types.includes('checkbox'))) {
                     $('.options-wrapper').show();
+                    $('#imageOptionsWrapper').show();
                 } else {
                     $('.options-wrapper').hide();
+                    $('#imageOptionsWrapper').hide();
                 }
             }
 
             toggleOptions();
 
             $('#type').on('change', toggleOptions);
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const select = document.getElementById('type');
-            const display = document.getElementById('selectedTypes');
 
-            function updateSelected() {
-                const selected = Array.from(select.selectedOptions).map(opt => opt.text);
-                display.value = selected.join(', ') || 'No types selected';
+            // Image preview for selected files
+            // Image preview with delete button
+            let selectedFiles = [];
+
+            $('#optionImagesInput').on('change', function(e) {
+                const files = Array.from(e.target.files);
+
+                files.forEach(file => {
+                    selectedFiles.push(file);
+
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const imgWrapper = $('<div>').css({
+                            'position': 'relative',
+                            'width': '80px',
+                            'height': '80px'
+                        });
+
+                        const img = $('<img>').attr('src', event.target.result)
+                            .css({
+                                'width': '100%',
+                                'height': '100%',
+                                'object-fit': 'cover',
+                                'border': '1px solid #ccc',
+                                'border-radius': '5px'
+                            });
+
+                        const removeBtn = $('<span>')
+                            .html('&times;')
+                            .css({
+                                'position': 'absolute',
+                                'top': '-5px',
+                                'right': '-5px',
+                                'background': '#ff000000',
+                                'color': 'black',
+                                'border-radius': '50%',
+                                'padding': '2px 6px',
+                                'cursor': 'pointer',
+                                'font-weight': 'bold'
+                            })
+                            .on('click', function() {
+                                const index = imgWrapper.index();
+                                selectedFiles.splice(index, 1);
+                                imgWrapper.remove();
+                                updateFileInput();
+                            });
+
+                        imgWrapper.append(img).append(removeBtn);
+                        $('#imagePreview').append(imgWrapper);
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                updateFileInput();
+            });
+
+            // Update the file input so it reflects selectedFiles array
+            function updateFileInput() {
+                const dataTransfer = new DataTransfer();
+                selectedFiles.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+                document.getElementById('optionImagesInput').files = dataTransfer.files;
             }
 
-            // Update on change
-            select.addEventListener('change', updateSelected);
-
-            // Initialize on page load
-            updateSelected();
         });
     </script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

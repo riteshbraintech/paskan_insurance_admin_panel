@@ -17,7 +17,6 @@ class Banner extends Model
         if ($this->image) {
             return asset('/public/admin/banners/img/' . $this->image);
         }
-        return asset('/public/admin/banners/img/default.png');
     }
 
 

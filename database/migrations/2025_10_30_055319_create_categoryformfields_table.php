@@ -19,7 +19,9 @@ class CreateCategoryformfieldsTable extends Migration
             $table->string('label')->nullable();
             $table->string('place_holder')->nullable();
             $table->string('name')->nullable();
-            $table->json('type')->nullable();
+            $table->string('type')->nullable();
+            $table->string('optiontype')->nullable();
+            $table->json('images')->nullable();
             $table->json('options')->nullable();
             $table->boolean('is_required')->default(false);
             $table->integer('sort_order')->default(0)->comment('Used to sort fields in order');

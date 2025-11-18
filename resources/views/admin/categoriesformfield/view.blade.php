@@ -53,6 +53,15 @@
                         @endif
                     </td>
                 </tr>
+                <tr>
+                    <th>Image</th>
+                    <td>
+                        @foreach ($record->image_urls as $img)
+                            <img src="{{ $img }}" width="80">
+                        @endforeach
+
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
