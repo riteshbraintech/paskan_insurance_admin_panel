@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\v1;
+namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,18 +16,11 @@ class BannerResource extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'title'          => $this->title,
+            'title'         => $this->translation->title ?? $this->title,
+            'sub_title'         => $this->translation->sub_title ?? $this->sub_title,
+            'description'  => $this->translation->description ?? '',
             'sort_order'    => $this->sort_order,
-
             'image_url'   => $this->image_url ?? null,
-
-
-            'translation' => $this->whenLoaded('translation', function () {
-                return [
-                    'title'         => $this->translation->title ?? '',
-                    'description'  => $this->translation->description ?? '',
-                ];
-            }),
         ];
     }
 }

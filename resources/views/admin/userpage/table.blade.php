@@ -33,7 +33,7 @@
                         <div class="table-actions d-flex align-items-center gap-3 fs-6">
                             <a href="{{ route('admin.user.formfieldview', ['id' => $item->id]) }}"
                                 class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
-                                data-bs-placement="bottom" title="View"><i class="fa-solid fa-folder-tree"></i></a>
+                                data-bs-placement="bottom" title="View"><i class="fa-solid fa-list-ul"></i></a>
 
                             <a href="{{ route('admin.user.view', ['id' => $item->id]) }}"
                                 class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"

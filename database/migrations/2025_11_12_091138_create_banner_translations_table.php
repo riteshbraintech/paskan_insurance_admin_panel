@@ -19,6 +19,7 @@ class CreateBannerTranslationsTable extends Migration
             $table->string('lang_code');
 
             $table->string('title'); 
+            $table->string('sub_title')->nullable();
             $table->longText('description')->nullable(); 
     
             $table->timestamps(); 

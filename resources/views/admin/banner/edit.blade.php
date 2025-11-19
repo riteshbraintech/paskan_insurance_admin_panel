@@ -49,6 +49,27 @@
                                 </div>
                             @endforeach
 
+                            {{-- Multilingual Title --}}
+                            @foreach (langueses() as $langCode => $language)
+                                @php
+                                    $sub_titleValue = old("trans.$langCode.sub_title", $translations[$langCode]['sub_title'] ?? '');
+                                    $idValue = $translations[$langCode]['id'] ?? '';
+                                @endphp
+
+                                <input type="hidden" name="trans[{{ $langCode }}][id]" class="form-control"
+                                    value="{{ $idValue }}" />
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Sub Title ({{ $language }}) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="trans[{{ $langCode }}][sub_title]" class="form-control"
+                                        value="{{ $sub_titleValue }}" placeholder="Enter Sub Title in {{ $language }}">
+                                    @error("trans.$langCode.sub_title")
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @endforeach
+
                             {{-- Multilingual Content --}}
                             @foreach (langueses() as $langCode => $language)
                                 @php
@@ -94,7 +115,7 @@
         </div>
     </div>
 @endsection
-@push('scripts')
+{{-- @push('scripts')
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -108,4 +129,4 @@
             @endforeach
         });
     </script>
-@endpush
+@endpush --}}

@@ -40,10 +40,23 @@
                             @endforeach
 
                             @foreach (langueses() as $langCode => $language)
+                                <div class="col-md-6">
+                                    <label for="title" class="form-label">Sub Title ({{ $language }}) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="trans[{{ $langCode }}][sub_title]" class="form-control"
+                                        id="sub_title" value="{{ old('trans.' . $langCode . '.sub_title') }}"
+                                        placeholder=" {{ __('Enter Sub Title in') . ' ' . $language }}">
+                                    @if ($errors->has('trans.' . $langCode . '.sub_title'))
+                                        <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.sub_title') }}</div>
+                                    @endif
+                                </div>
+                            @endforeach
+
+                            @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-12">
                                     <label for="description" class="form-label">Description ({{ $language }}) </label>
                                     <textarea name="trans[{{ $langCode }}][description]" id="trans_{{ $langCode }}_description"
-                                        class="form-control" cols="30" rows="10">{{ old('trans.' . $langCode . '.description') }}</textarea>
+                                        class="form-control" cols="30" rows="5">{{ old('trans.' . $langCode . '.description') }}</textarea>
                                     @if ($errors->has('trans.' . $langCode . '.description'))
                                         <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.description') }}
                                         </div>
@@ -77,7 +90,7 @@
     </div>
 @endsection
 
-@push('scripts')
+{{-- @push('scripts')
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -91,4 +104,4 @@
             @endforeach
         });
     </script>
-@endpush
+@endpush --}}

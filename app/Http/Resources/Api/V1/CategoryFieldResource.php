@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\v1;
+namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,23 +15,16 @@ class CategoryFieldResource extends JsonResource
             'type'          => $this->type,
             'is_required'   => $this->is_required,
             'sort_order'    => $this->sort_order,
+            'label'         => $this->translation->label ?? $this->label,
+            'place_holder'  => $this->translation->place_holder ?? $this->place_holder,
 
-            'label'         => $this->label,
-            'place_holder'  => $this->place_holder,
-            'options'       => $this->options ?? [],
+            // FIXED: options now always array
+            'options'       => $this->translation->options ?? $this->options ?? [],
 
+            // FIXED: images already array due to casts
             'images' => collect($this->images ?? [])
                 ->map(fn($img) => asset('public/'.$img))
                 ->toArray(),
-
-
-            'translation' => $this->whenLoaded('translation', function () {
-                return [
-                    'label'         => $this->translation->label ?? '',
-                    'place_holder'  => $this->translation->place_holder ?? '',
-                    'options'       => json_decode($this->translation->options ?? '[]', true),
-                ];
-            }),
         ];
     }
 }
