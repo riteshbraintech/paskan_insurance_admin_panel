@@ -110,11 +110,12 @@
                                 {{-- EXISTING IMAGES --}}
                                 @if (!empty($record->images))
                                     @php
-                                        $images = json_decode($record->images, true);
+                                        $imagesArray = $record->images ?? [];
                                     @endphp
 
+
                                     <div class="d-flex flex-wrap gap-2 mt-2" id="existingImages">
-                                        @foreach ($images as $img)
+                                        @foreach ($imagesArray as $img)
                                             <div class="position-relative image-box">
                                                 <img src="{{ asset('public/' . $img) }}" class="img-thumbnail"
                                                     style="width:80px;height:80px;object-fit:cover;">

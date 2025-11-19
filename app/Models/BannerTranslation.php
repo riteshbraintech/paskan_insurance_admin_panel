@@ -13,6 +13,7 @@ class BannerTranslation extends Model
         'banner_id',
         'lang_code',
         'title',
+        'sub_title',
         'description',
     ];
 

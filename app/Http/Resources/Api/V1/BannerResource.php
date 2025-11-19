@@ -17,6 +17,7 @@ class BannerResource extends JsonResource
         return [
             'id'            => $this->id,
             'title'         => $this->translation->title ?? $this->title,
+            'sub_title'         => $this->translation->sub_title ?? $this->sub_title,
             'description'  => $this->translation->description ?? '',
             'sort_order'    => $this->sort_order,
             'image_url'   => $this->image_url ?? null,

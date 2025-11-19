@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Banner extends Model
 {
     use HasFactory;
-    protected $fillable = ['title','sort_order','image','is_active'];
+    protected $fillable = ['title','sub_title','sort_order','image','is_active'];
 
     // create image url accessor
     public function getImageUrlAttribute()

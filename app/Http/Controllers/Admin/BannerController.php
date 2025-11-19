@@ -47,10 +47,12 @@ class BannerController extends Controller
         $request->validate([
             // --- English ---
             'trans.en.title' => 'required|string|max:255',
+            'trans.en.sub_title' => 'required|string|max:255',
             'trans.en.description' => 'required|string',
 
             // --- Thai ---
             'trans.th.title' => 'required|string|max:255',
+            'trans.th.sub_title' => 'required|string|max:255',
             'trans.th.description' => 'required|string',
 
             // --- Optional ---
@@ -104,6 +106,7 @@ class BannerController extends Controller
                 $bannerInfo->translations()->create([
                     'lang_code' => $langCode,
                     'title' => $trans['title'],
+                    'sub_title'=> $trans['sub_title'],
                     'description' => strip_tags($trans['description']),
                 ]);
             }
@@ -141,6 +144,7 @@ class BannerController extends Controller
             return [$item->lang_code => [
                 'id' => $item->id,
                 'title' => $item->title,
+                'sub_title' => $item->sub_title,
                 'description' => $item->description,
                 ]];
         });
@@ -153,10 +157,12 @@ class BannerController extends Controller
         $validatedData = $request->validate([
             // --- English ---
             'trans.en.title' => 'required|string|max:255',
+            'trans.en.sub_title' => 'required|string|max:255',
             'trans.en.description' => 'required|string',
 
             // --- Thai ---
             'trans.th.title' => 'required|string|max:255',
+            'trans.th.sub_title' => 'required|string|max:255',
             'trans.th.description' => 'required|string',
             // Optional field
             'is_active' => 'nullable|boolean',
@@ -210,6 +216,7 @@ class BannerController extends Controller
                     ['lang_code' => $langCode],
                     [
                         'title' => $translationData['title'],
+                        'sub_title'=>$translationData['sub_title'],
                         'description' => $translationData['description'] ?? '',
                     ]
                 );
@@ -257,6 +264,7 @@ class BannerController extends Controller
             return [$item->lang_code => [
                 'id' => $item->id,
                 'title' => $item->title,
+                'sub_title'=>$item->sub_title,
                 'description' => $item->description,
                 ]];
         });

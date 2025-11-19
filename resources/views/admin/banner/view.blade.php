@@ -42,6 +42,10 @@
                             <td>{{ $data['title'] }}</td>
                         </tr>
                         <tr>
+                            <th width="25%">Sub Title</th>
+                            <td>{{ $data['sub_title'] }}</td>
+                        </tr>
+                        <tr>
                             <th>Description</th>
                             <td>{!! $data['description'] !!}</td>
                         </tr>

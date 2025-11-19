@@ -17,7 +17,11 @@ class CategoryFieldResource extends JsonResource
             'sort_order'    => $this->sort_order,
             'label'         => $this->translation->label ?? $this->label,
             'place_holder'  => $this->translation->place_holder ?? $this->place_holder,
-            'options'       => json_decode($this->translation->options ?? ($this->options ?? []), true),
+
+            // FIXED: options now always array
+            'options'       => $this->translation->options ?? $this->options ?? [],
+
+            // FIXED: images already array due to casts
             'images' => collect($this->images ?? [])
                 ->map(fn($img) => asset('public/'.$img))
                 ->toArray(),

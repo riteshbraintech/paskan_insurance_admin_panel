@@ -356,8 +356,9 @@ class CategoryFormFieldController extends Controller
                 'place_holder' => $request->trans['en']['place_holder'],
                 'name' => $request->name,
                 'type' => $request->type,
-                'options' => json_encode($primaryOptions),
-                'images' => json_encode($images),
+                'options' => $primaryOptions,
+                'images' => $images,
+
             ]);
 
 
