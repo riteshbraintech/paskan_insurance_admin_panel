@@ -130,11 +130,11 @@ class CategoryFormFieldController extends Controller
                 // Validate image count matches number of English options
                 $uploadedImages = $request->file('option_images') ?? [];
 
-                if (count($uploadedImages) !== count($primaryOptions)) {
-                    return back()->withErrors([
-                        'option_images' => "Upload exactly " . count($primaryOptions) . " images to match English options."
-                    ]);
-                }
+                // if (count($uploadedImages) !== count($primaryOptions)) {
+                //     return back()->withErrors([
+                //         'option_images' => "Upload exactly " . count($primaryOptions) . " images to match English options."
+                //     ]);
+                // }
 
             
                  //STEP 2: UPLOAD IMAGES (only once)
@@ -172,7 +172,7 @@ class CategoryFormFieldController extends Controller
                 'type' => $request->type,
 
                 // JSON encode English options (master copy)
-                'options' => !empty($primaryOptions) ? json_encode($primaryOptions) : null,
+                'options' => !empty($primaryOptions) ? $primaryOptions : null,
 
                 // images uploaded once
                 // 'images' => $imagePaths ? json_encode($imagePaths) : null,
@@ -420,15 +420,11 @@ class CategoryFormFieldController extends Controller
     {
         $field = CategoryFormField::findOrFail($id);
 
-        // Check if there are images to delete
         if (!empty($field->images)) {
-            // Decode the images (assuming they are stored as JSON in the database)
-            $images = json_decode($field->images, true);
-
-            foreach ($images as $image) {
-                $imagePath = public_path($image);  // Get the full path to the image
+            foreach ($field->images as $image) {
+                $imagePath = public_path($image);
                 if (file_exists($imagePath)) {
-                    unlink($imagePath);  
+                    unlink($imagePath);
                 }
             }
         }

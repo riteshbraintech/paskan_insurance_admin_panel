@@ -33,6 +33,7 @@ Route::prefix('/admin')->group(function () {
         
         // --- Admin Routes for CMS Pages (Protected) ---
         Route::resource('cmspage', CMSController::class)->names('admin.cmspage');
+        Route::get('delete/{cmspage?}', [CMSController::class, 'destroy'])->name('admin.cmspage.delete');
         Route::post('status/{id?}', [CMSController::class, 'changeStatus'])->name('admin.cmspage.change.status');
 
 

@@ -79,7 +79,7 @@ class CMSController extends Controller
             // commit transaction
             DB::commit();
 
-            return redirect()->route('admin.cmspage.index')->with('success',"Pages added successfully");
+            return redirect()->route('admin.cmspage.index')->with('success',"CMS Pages added successfully");
         } catch (\Throwable $th) {
             \Log::alert(" CMSController - Store Function : ". $th->getMessage());
             DB::rollBack();
@@ -186,7 +186,7 @@ class CMSController extends Controller
     public function destroy($id)
     {
         CMSPage::findOrFail($id)->delete();
-        return redirect()->route('admin.cmspage.list')->with('success', 'Client Removed');
+        return redirect()->route('admin.cmspage.index')->with('success', 'CMS Page Removed Successfully');
     }
 
     public function merge(Request $request)

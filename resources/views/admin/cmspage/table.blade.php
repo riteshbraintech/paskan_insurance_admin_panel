@@ -44,7 +44,7 @@
                                     class="fa-solid fa-pen-to-square text-warning fs-5"></i></a>
 
                             <a href="javascript:void(0);"
-                                onclick="deleteItem('{{ route('admin.cmspage.destroy', ['cmspage' => $item->id]) }}')"
+                                onclick="deleteItem('{{ route('admin.cmspage.delete', ['cmspage' => $item->id]) }}')"
                                 class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                 title="Delete"><i class="fa-solid fa-trash fs-5"></i></a>
                         </div>

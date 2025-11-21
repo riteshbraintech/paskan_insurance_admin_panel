@@ -24,7 +24,7 @@ class BannerController extends Controller
             }); 
         }
 
-        $records = $records->orderby('id','desc')->paginate($perPage);
+        $records = $records->sortable('id','desc')->paginate($perPage);
         // dd($records);
 
         if (!empty($isAjax)) {
