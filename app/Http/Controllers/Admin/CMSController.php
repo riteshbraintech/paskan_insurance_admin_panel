@@ -185,8 +185,9 @@ class CMSController extends Controller
 
     public function destroy($id)
     {
+
         CMSPage::findOrFail($id)->delete();
-        return redirect()->route('admin.cmspage.list')->with('success', 'Client Removed');
+        return redirect()->route('admin.cmspage.index')->with('success', 'Client Removed');
     }
 
     public function merge(Request $request)
@@ -233,16 +234,6 @@ class CMSController extends Controller
         
         return view('admin.cmspage.bids-list',compact('bids'));
     }
-
-
-    // public function changeStatus(Request $request){
-    //     // dd($request);
-    //     $record = CMSPage::findOrFail($request->id);
-    //     $status = $record->is_published ? 0 : 1;
-    //     $record->is_published = $status;
-    //     $record->save();
-    //     return response()->json(['status' => $status]);
-    // }
 
     public function changeStatus($id)
     {

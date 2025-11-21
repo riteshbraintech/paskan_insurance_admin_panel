@@ -19,7 +19,10 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\CMSController;
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\FAQController;
+use App\Http\Controllers\Admin\InsuranceClaimController;
+use App\Http\Controllers\Admin\InsuranceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserInsuranceFillupController;
 
@@ -33,6 +36,7 @@ Route::prefix('/admin')->group(function () {
         
         // --- Admin Routes for CMS Pages (Protected) ---
         Route::resource('cmspage', CMSController::class)->names('admin.cmspage');
+        Route::get('delete/{cmspage?}', [CMSController::class, 'destroy'])->name('admin.cmspage.destroy');
         Route::post('status/{id?}', [CMSController::class, 'changeStatus'])->name('admin.cmspage.change.status');
 
 
@@ -232,6 +236,46 @@ Route::prefix('/admin')->group(function () {
             Route::post('update/{id?}', [ArticleController::class, 'update'])->name('admin.article.update');
             Route::get('delete/{id?}', [ArticleController::class, 'delete'])->name('admin.article.delete');
             Route::get('view/{id?}', [ArticleController::class, 'view'])->name('admin.article.view');
+        });
+
+        //Contact Route
+        Route::group(['prefix'=>'contact'],function(){
+            Route::get('/',[ContactController::class,'index'])->name('admin.contact.index');
+            Route::get('create', [ContactController::class, 'create'])->name('admin.contact.create');
+            Route::post('store', [ContactController::class, 'store'])->name('admin.contact.store');
+            Route::post('status/{id?}', [ContactController::class, 'changeStatus'])->name('admin.contact.change.status');
+            Route::get('edit/{id?}', [ContactController::class, 'edit'])->name('admin.contact.edit');
+            Route::post('update/{id?}', [ContactController::class, 'update'])->name('admin.contact.update');
+            Route::get('delete/{id?}', [ContactController::class, 'delete'])->name('admin.contact.delete');
+            Route::get('view/{id?}', [ContactController::class, 'view'])->name('admin.contact.view');
+        });
+
+        // Insurance Categories route
+        Route::group(['prefix'=>'insurance'],function(){
+            Route::get('/',[InsuranceController::class,'index'])->name('admin.insurances.index');
+            Route::get('create', [InsuranceController::class, 'create'])->name('admin.insurances.create');
+            Route::post('store', [InsuranceController::class, 'store'])->name('admin.insurances.store');
+            Route::post('status/{id?}', [InsuranceController::class, 'changeStatus'])->name('admin.insurances.change.status');
+            Route::get('edit/{id?}', [InsuranceController::class, 'edit'])->name('admin.insurances.edit');
+            Route::post('update/{id?}', [InsuranceController::class, 'update'])->name('admin.insurances.update');
+            Route::get('delete/{id?}', [InsuranceController::class, 'delete'])->name('admin.insurances.delete');
+            Route::get('view/{id?}', [InsuranceController::class, 'view'])->name('admin.insurances.view');
+            Route::post('reorder', [InsuranceController::class, 'reorder'])->name('admin.insurances.reorder');
+        });
+
+        // Claim Insurance route
+        Route::group(['prefix'=>'claiminsurance'],function(){
+            Route::get('/',[InsuranceClaimController::class,'index'])->name('admin.claiminsurance.index');
+            Route::get('create', [InsuranceClaimController::class, 'create'])->name('admin.claiminsurance.create');
+            Route::post('store', [InsuranceClaimController::class, 'store'])->name('admin.claiminsurance.store');
+            Route::post('status/{id?}', [InsuranceClaimController::class, 'changeStatus'])->name('admin.claiminsurance.change.status');
+            Route::get('edit/{id?}', [InsuranceClaimController::class, 'edit'])->name('admin.claiminsurance.edit');
+            Route::post('update/{id?}', [InsuranceClaimController::class, 'update'])->name('admin.claiminsurance.update');
+            Route::get('delete/{id?}', [InsuranceClaimController::class, 'delete'])->name('admin.claiminsurance.delete');
+            Route::get('view/{id?}', [InsuranceClaimController::class, 'view'])->name('admin.claiminsurance.view');
+            Route::get('filter', [InsuranceClaimController::class, 'filter'])->name('admin.claiminsurance.filter');
+            Route::post('reorder', [InsuranceClaimController::class, 'reorder'])->name('admin.claiminsurance.reorder');
+
         });
 
     });

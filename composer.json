@@ -47,7 +47,8 @@
         },
         "files": [
             "app/Helper/AdminHelper.php",
-            "app/Helper/ApiHelper.php"
+            "app/Helper/ApiHelper.php",
+            "app/Helper/UserActivityLogHelper.php"
         ]
     },
     "autoload-dev": {

@@ -17,6 +17,43 @@ class AttachMetaInfoMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        $endpoint = $request->path();
+
+        // 1️⃣ Default: user via Sanctum
+        $user = auth('sanctum')->user();
+
+        // 2️⃣ Special Case: LOGIN (user not authenticated yet)
+        if (!$user && $endpoint === 'api/v1/auth/login') {
+
+            // If login uses id_number
+            $user = \App\Models\User::where('id_number', $request->id_number)->first();
+            
+            // Attach the user temporarily so logActivity() gets user_id
+            auth()->setUser($user);
+        }
+
+        // 3️⃣ User ID + Name
+        $userId = $user->id ?? null;
+        $userName = $user->name ?? 'Guest';
+
+        // Description Map
+        $endpointDescriptions = [
+            'api/v1/auth/login' => "$userName logged in",
+            'api/v1/logout'     => "$userName logged out",
+            'api/v1/home'       => "$userName opened Home Page",
+            'api/v1/profile'    => "$userName viewed Profile Page",
+            // add more...
+        ];
+
+        $description = $endpointDescriptions[$endpoint] ?? "$userName made a request";
+
+        $ip = $request->ip() === '::1' ? '127.0.0.1' : $request->ip();
+
+        // 4️⃣ Save Log
+        if ($userId) {
+            logActivity('api_request', $endpoint, $description, $ip);
+        }
+        
         $response = $next($request);
 
         if ($response instanceof JsonResponse) {

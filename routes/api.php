@@ -22,15 +22,6 @@ use App\Http\Controllers\Api\V1\UserInsuranceFillupController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/categoryformfield-list',[CategoryFormControler::class,'index']);
-Route::get('/categoryformfield-list/{label}',[CategoryFormControler::class,'categoryformfieldlist']);
-
-
-Route::get('/categoryformfields/{category_id}',[CategoryFormControler::class,'categoryfields']);
-
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
 
 // Semi public routes
 Route::prefix('v1')->middleware(['api'])->group(function () {
@@ -39,6 +30,7 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     Route::get('home', [HomeController::class, 'home']);
     Route::get('header-menu', [HomeController::class, 'headerMenu']);
     Route::get('category/fields/{slug}',[HomeController::class,'categoryfield']);
+    Route::post('contact',[HomeController::class,'contactform']);
 
 
     //get FAQ List
@@ -63,8 +55,8 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     
 
     
-    Route::get('/cms-page',[CMSPageControler::class,'index']);
-    Route::get('/cms-page/{slug}',[CMSPageControler::class,'cmspagedetail']);
+    // Route::get('/cms-page',[CMSPageControler::class,'index']);
+    // Route::get('/cms-page/{slug}',[CMSPageControler::class,'cmspagedetail']);
 
 
     // create a prefix for auth routes

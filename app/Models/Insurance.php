@@ -7,28 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Kyslik\ColumnSortable\Sortable;
 
-class Category extends Model
+class Insurance extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory;
+    protected $fillable = ['title', 'slug', 'is_published', 'sort_order'];
 
-    protected $fillable = ['title', 'slug', 'is_active', 'image'];
-    public $sortable = ['id', 'title', 'is_active'];
+    public $sortable = ['id', 'title', 'is_published'];
 
     // create a is active scope to filter active categories
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_published', true);
     }
-
-    // create image url accessor
-    public function getImageUrlAttribute()
-    {
-        // $imagePath = $item->image ? asset('/public/admin/categories/img/' . $item->image) : asset('/public/admin/categories/img/default.png');
-        if ($this->image) {
-            return asset('/public/admin/categories/img/' . $this->image);
-        }
-    }
-
 
     // set slug attribute to be lowercase and replace spaces with hyphens based on title before saving to database
     public function setSlugAttribute($value)
@@ -39,15 +29,13 @@ class Category extends Model
     // create hasmany relationship with CMSPageTranslation
     public function translations()
     {
-        return $this->hasMany(CategoryTranslation::class, 'category_id');
+        return $this->hasMany(InsuranceTranslation::class, 'insurance_id');
     }
 
     // crate a hasOne realtion to get translation in current app locale
     public function translation()
     {
-        return $this->hasOne(CategoryTranslation::class, 'category_id')
+        return $this->hasOne(InsuranceTranslation::class, 'insurance_id')
         ->where('lang_code', app()->getLocale());
     }
-
-    
 }
