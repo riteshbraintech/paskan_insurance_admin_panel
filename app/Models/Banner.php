@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Kyslik\ColumnSortable\Sortable;
 
 class Banner extends Model
 {
-    use HasFactory;
+    use HasFactory,Sortable;
     protected $fillable = ['title','sub_title','sort_order','image','is_active'];
 
     // create image url accessor

@@ -3,200 +3,119 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\CategoryFieldFormTranslation;
-use App\Models\Categoryformfield;
+use App\Models\Insurance;
+use App\Models\InsuranceClaim;
+use App\Models\InsuranceClaimTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Stmt\TryCatch;
 
-class CategoryFormFieldController extends Controller
+
+class InsuranceClaimController extends Controller
 {
     public function index(Request $request)
     {
         $current_page = $request->page ?? 1;
         $search = $request->search ?? "";
         $perPage = $request->perPage ?? 50;
-        $isAjax = $request->method;
+        $isAjax = $request->ajax();
 
-        $records = Categoryformfield::with('translations');
-        if($search){
-            $records = $records->whereHas('translations', function($q) use($search){
-                $q->where('label', 'like', '%'.$search.'%');
-            }); 
+        // Start query builder
+        $records = InsuranceClaim::with('translations');
+
+        // Apply search
+        if ($search) {
+            $records->whereHas('translations', function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%");
+            });
         }
-        // dd($records);
-        $records = $records->sortable('sort_order','asc')->paginate($perPage);
 
-        $categories = Category::with('translations')
-            ->get();
+        // Sorting + pagination
+        $records = $records->sortable(['sort_order' => 'asc'])->paginate($perPage);
 
+        // If you need all for dropdown
+        $insuranceclaims = InsuranceClaim::with('translations')->get();
 
-        if (!empty($isAjax)) {
-            $html = view('admin.categoriesformfield.table', compact('records'))->render();
+        if ($isAjax) {
+            $html = view('admin.claiminsurance.table', compact('records'))->render();
             return response()->json(['html' => $html]);
-        } else {
-            return view('admin.categoriesformfield.index', compact('records','categories'));
         }
 
+        return view('admin.claiminsurance.index', compact('records','insuranceclaims'));
     }
+
 
     public function filter(Request $request)
     {
         $perPage = $request->perPage ?? 50;
 
-        $query = CategoryFormField::with('category.translations');
+        $query = InsuranceClaim::with('insurance.translations');
         
-            if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
+            if ($request->insurance_id) {
+            $query->where('insurance_id', $request->insurance_id);
         }
 
         if ($request->search) {
-            $query->where('label', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
         $records = $query->orderBy('sort_order', 'asc')->paginate($perPage);
         // Return partial HTML for AJAX
-        $html = view('admin.categoriesformfield.table', compact('records'))->render();
+        $html = view('admin.claiminsurance.table', compact('records'))->render();
         return response()->json(['html' => $html]);
     }
 
 
     public function create()
     {
-        $categories = Category::with('translations')
-            ->where('is_active', 1) 
+        $insurances = Insurance::with('translation')
+            ->where('is_published', 1) 
             ->get();
-        return view('admin.categoriesformfield.create', compact('categories'));
+        return view('admin.claiminsurance.create', compact('insurances'));
     }
 
 
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255|unique:categoryformfields,name',
-            'type' => 'required|string',
+            'insurance_id' => 'required|exists:insurances,id',
 
             // Multilingual required fields
-            'trans.th.label' => 'required|string',
-            'trans.en.label' => 'required|string',
-            'trans.th.place_holder' => 'required|string',
-            'trans.en.place_holder' => 'required|string',
-
-            // Options (JSON text)
-            'trans.th.options' => 'nullable|string',
-            'trans.en.options' => 'nullable|string',
-
-            // Images (one time only)
-            'option_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'trans.th.title' => 'required|string',
+            'trans.en.title' => 'required|string',
+            'trans.th.description' => 'required|string',
+            'trans.en.description' => 'required|string',
         ]);
 
         DB::beginTransaction();
         try {
 
             // Compute sort order
-            $lastOrder = CategoryFormField::max('sort_order');
+            $lastOrder = InsuranceClaim::max('sort_order');
             $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
 
             // English fallback
-            $englishLabel = $request->trans['en']['label'] ?? $request->trans['th']['label'];
-            $englishPlaceholder = $request->trans['en']['place_holder'] ?? $request->trans['th']['place_holder'];
+            $englishTitle = $request->trans['en']['title'] ?? $request->trans['th']['title'];
 
-            // STEP 1: HANDLE OPTIONS
-
-            $optionsPerLang = [];
-            $primaryOptions = [];
-
-            if (in_array($request->type, ['checkbox', 'radio', 'select'])) {
-
-                // Decode options for each language
-                foreach ($request->trans as $lang => $t) {
-                    if (!empty($t['options'])) {
-                        $decoded = json_decode($t['options'], true);
-
-                        if (!is_array($decoded)) {
-                            return back()->withErrors(["trans.$lang.options" => "Invalid JSON in $lang options."]);
-                        }
-
-                        $optionsPerLang[$lang] = json_encode($decoded);
-
-                        // Use English as the master option list
-                        if ($lang === 'en') {
-                            $primaryOptions = $decoded;
-                        }
-                    }
-                }
-
-                // Validate image count matches number of English options
-                $uploadedImages = $request->file('option_images') ?? [];
-
-                // if (count($uploadedImages) !== count($primaryOptions)) {
-                //     return back()->withErrors([
-                //         'option_images' => "Upload exactly " . count($primaryOptions) . " images to match English options."
-                //     ]);
-                // }
-
-            
-                 //STEP 2: UPLOAD IMAGES (only once)
-                $imagePaths = [];
-                $folder = 'admin/option_images/';
-
-                if ($uploadedImages) {
-                    if (!file_exists(public_path($folder))) {
-                        mkdir(public_path($folder), 0777, true);
-                    }
-
-                    foreach ($uploadedImages as $img) {
-                        $fileName = time() . '_' . uniqid() . '_' . str_replace(' ', '_', $img->getClientOriginalName());
-                        $img->move(public_path($folder), $fileName);
-                        $imagePaths[] = $folder . $fileName;
-                    }
-                }
-
-            } else {
-                // Non-option fields
-                $imagePaths = null;
-            }
-
-
-            $field = CategoryFormField::create([
-                'category_id' => $request->category_id,
-                'label' => $englishLabel,
-                'place_holder' => $englishPlaceholder,
-                'name' => $request->name,
-                'type' => $request->type,
-
-                // JSON encode English options (master copy)
-                'options' => !empty($primaryOptions) ? $primaryOptions : null,
-
-                'images' => $imagePaths ?: null,
-
-
-                'is_required' => $request->has('is_required'),
+// dd($request->insurance_id);
+            $field = InsuranceClaim::create([
+                'insurance_id' => $request->insurance_id,
+                'title' => $englishTitle,
                 'sort_order' => $newSortOrder,
             ]);
 
-            /**
-             * ----------------------------------------------------------
-             * STEP 4: Create translations (no images here)
-             * ----------------------------------------------------------
-             */
-
             foreach ($request->trans as $lang => $data) {
-                CategoryFieldFormTranslation::create([
-                    'categoryformfield_id' => $field->id,
+                InsuranceClaimTranslation::create([
+                    'insurance_claim_id' => $field->id,
                     'lang_code' => $lang,
-                    'label' => $data['label'],
-                    'place_holder' => $data['place_holder'],
-                    'options' => $data['options'] ?? null,
+                    'title' => $data['title'],
+                    'description' => $data['description'],
                 ]);
             }
 
             DB::commit();
 
             return redirect()
-                ->route('admin.categoryformfield.index')
-                ->with('success', 'Field created successfully.');
+                ->route('admin.claiminsurance.index')
+                ->with('success', 'Insurance Claimed successfully.');
 
         } catch (\Throwable $th) {
 
@@ -204,7 +123,7 @@ class CategoryFormFieldController extends Controller
             \Log::alert("Error in Store: " . $th->getMessage());
 
             return redirect()
-                ->route('admin.categoryformfield.index')
+                ->route('admin.claiminsurance.index')
                 ->with('danger', 'Something went wrong');
         }
     }
@@ -229,7 +148,7 @@ class CategoryFormFieldController extends Controller
         return response()->json([
             'success' => true,
             'status' => $status,
-            'message' => "Category Form Field Status changed to {$status} successfully!"
+            'message' => "Status changed to {$status} successfully!"
         ]);
     }
 
@@ -453,7 +372,6 @@ class CategoryFormFieldController extends Controller
 
         return response()->json(['message' => 'Order updated successfully.']);
     }
-
 
 
 }

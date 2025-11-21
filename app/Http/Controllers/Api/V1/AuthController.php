@@ -93,6 +93,16 @@ class AuthController extends Controller
         //  2. Attempt login
         $user = User::where('id_number', $request->id_number)->first();
 
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        //Trigger Login Event
+        Auth::login($user);
+
          // 2️⃣ Log in via session (creates Sanctum cookie)
         // Auth::login($user);
         // $request->session()->regenerate();

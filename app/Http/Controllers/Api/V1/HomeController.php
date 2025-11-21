@@ -11,8 +11,7 @@ use App\Models\Banner;
 use App\Models\Categoryformfield;
 use App\Models\CMSPage;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
-
-
+use App\Models\Contact;
 
 class HomeController extends Controller
 {
@@ -187,55 +186,33 @@ class HomeController extends Controller
         ]);
     }
 
-
-
-    //get Banner Part
-    // public function banner(){
-    //     $bannerinfo=Banner::with('translation')->where('is_active',1)->orderby('sort_order','asc')->get();
-
-    //     return response()->json(
-    //         [
-    //             'status' => 'success',
-    //             'message' => 'Banners fetched successfully.',
-    //             'data' => $bannerinfo ?? null,
-    //         ],
-    //         200
-    //     );
-    // }
-
-
-    public function show($id)
+    public function contactform(Request $request)
     {
-        // Load field + translations
-        $field=Categoryformfield::with('translations')->findOrFail($id);
+        $request->validate([
+            'fullname'    => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'phonenumber' => 'required|string|max:20',
+            'subject'     => 'required|string|max:255',
+            'message'     => 'required|string',
+        ]);
 
-        // Primary English options (values)
-        $primaryOptions = json_decode($field->options, true) ?? [];
-
-        // Images (shared)
-        $images = json_decode($field->images, true) ?? [];
-
-        // Translation options (labels)
-        $translatedOptions = json_decode(optional($field->translations->first())->options, true)
-                            ?? $primaryOptions;
-
-        // Build final array
-        $output = [];
-        foreach ($primaryOptions as $index => $val) {
-            $output[] = [
-                "label" => $translatedOptions[$index] ?? $val,
-                "value" => $val,
-                "image" => isset($images[$index]) 
-                            ? asset($images[$index])
-                            : null
-            ];
-        }
+        $userId = auth('sanctum')->id(); 
+        
+        $contact = Contact::create([
+            'user_id'     => $userId,       
+            'fullname'    => $request->fullname,
+            'email'       => $request->email,
+            'phonenumber' => $request->phonenumber,
+            'subject'     => $request->subject,
+            'message'     => $request->message,
+        ]);
 
         return response()->json([
-            "field_id" => $field->id,
-            "type"     => $field->type,
-            "options"  => $output
-        ]);
+            'status'  => true,
+            'message' => 'Your inquiry has been submitted successfully.',
+            'data'    => $contact,
+        ], 200);
     }
+
 
 }

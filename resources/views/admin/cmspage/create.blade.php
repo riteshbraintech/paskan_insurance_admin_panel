@@ -24,7 +24,7 @@
                         <form action="{{ route('admin.cmspage.store') }}" method="post" class="row g-3 needs-validation" enctype="multipart/form-data">
                             @csrf
 
-                            @if ($errors->any())
+                            {{-- @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
                                         @foreach ($errors->all() as $error)
@@ -32,7 +32,7 @@
                                         @endforeach
                                     </ul>
                                 </div>
-                            @endif
+                            @endif --}}
 
                             @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-6">
