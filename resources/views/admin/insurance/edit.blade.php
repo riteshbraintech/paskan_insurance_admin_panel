@@ -88,7 +88,7 @@
     </div>
 @endsection
 @push('scripts')
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             @foreach (langueses() as $langCode => $language)
@@ -100,5 +100,5 @@
                     .catch(error => console.error(error));
             @endforeach
         });
-    </script>
+    </script> --}}
 @endpush

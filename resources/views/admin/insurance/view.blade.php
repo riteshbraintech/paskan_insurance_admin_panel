@@ -23,10 +23,10 @@
     <div class="card shadow-sm">
         <div class="card-header bg-info text-white fw-bold">
             Translations 
-            @if($record->is_active)
-                <span class="badge bg-success">Published</span>
+            @if($record->is_published)
+                <span class="badge bg-success">Active</span>
             @else
-                <span class="badge bg-danger">Unpublished</span>
+                <span class="badge bg-danger">Inactive</span>
             @endif
             
         </div>

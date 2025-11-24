@@ -49,4 +49,16 @@ class ContactController extends Controller
         return redirect()->route('admin.contact.index')->with('success', 'Contact deleted successfully.');
     }
 
+    public function view($id)
+    {
+        // Load only the main record (NO translations)
+        $record = Contact::findOrFail($id);
+
+        // Get all categories (NO translations)
+        $contact = Contact::all();
+
+        return view('admin.contact.view', compact('record', 'contact'));
+    }
+
+
 }

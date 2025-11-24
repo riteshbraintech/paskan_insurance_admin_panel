@@ -9,10 +9,10 @@ use Kyslik\ColumnSortable\Sortable;
 
 class Insurance extends Model
 {
-    use HasFactory;
+    use HasFactory,Sortable;
     protected $fillable = ['title', 'slug', 'is_published', 'sort_order'];
 
-    public $sortable = ['id', 'title', 'is_published'];
+    public $sortable = ['id','sort_order', 'title', 'is_published'];
 
     // create a is active scope to filter active categories
     public function scopeActive($query)

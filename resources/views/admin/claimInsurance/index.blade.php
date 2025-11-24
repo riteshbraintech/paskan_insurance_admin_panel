@@ -41,16 +41,16 @@
                     @include('admin.elements.search')
 
                     <div class="col-md-3">
-                        <select id="categoryFilter" name="category_id" class="form-select">
+                        <select id="insuranceFilter" name="insurance_id" class="form-select">
                             <option value="">-- Filter by Insurance --</option>
-                            @foreach ($insuranceclaims as $insuranceclaim)
+                            @foreach ($insurances as $insurance)
                                 @php
                                     $lang = app()->getLocale() ?? 'en';
-                                    $translation = $insuranceclaim->translations->where('lang_code', $lang)->first();
+                                    $translation = $insurance->translations->where('lang_code', $lang)->first();
                                     if (!$translation) {
-                                        $translation = $category->translations->first();
+                                        $translation = $insurance->translations->first();
                                     }
-                                    $insuranceName = $translation->title ?? ($insuranceclaim->title ?? 'Unnamed');
+                                    $insuranceName = $translation->title ?? ($insurance->title ?? 'Unnamed');
                                 @endphp
                                 <option value="{{ $insurance->id }}">{{ $insuranceName }}</option>
                             @endforeach
@@ -133,19 +133,19 @@
             $(document).on('ajaxComplete', initializeFacebox);
 
             // AJAX filter
-            $('#categoryFilter, #search-input').on('change keyup', function() {
+            $('#insuranceFilter, #search-input').on('change keyup', function() {
                 filterTable();
             });
 
             function filterTable(page = 1) {
-                let category_id = $('#categoryFilter').val();
+                let insurance_id = $('#insuranceFilter').val();
                 let search = $('#search-input').val();
 
                 $.ajax({
-                    url: "{{ route('admin.categoryformfield.filter') }}",
+                    url: "{{ route('admin.claiminsurance.filter') }}",
                     type: "GET",
                     data: {
-                        category_id,
+                        insurance_id,
                         search,
                         page
                     },

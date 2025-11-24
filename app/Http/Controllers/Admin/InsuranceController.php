@@ -25,7 +25,7 @@ class InsuranceController extends Controller
             }); 
         }
 
-        $records = $records->orderby('id','asc')->paginate($perPage);
+        $records = $records->sortable('sort_order','asc')->paginate($perPage);
         // dd($records);
 
         if (!empty($isAjax)) {
