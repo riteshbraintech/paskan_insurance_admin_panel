@@ -49,6 +49,27 @@
                                 </div>
                             @endforeach
 
+                            {{-- Multilingual sub Title --}}
+                            @foreach (langueses() as $langCode => $language)
+                                @php
+                                    $subtitleValue = old("trans.$langCode.subtitle", $translations[$langCode]['subtitle'] ?? '');
+                                    $idValue = $translations[$langCode]['id'] ?? '';
+                                @endphp
+
+                                <input type="hidden" name="trans[{{ $langCode }}][id]" class="form-control"
+                                    value="{{ $idValue }}" />
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Sub Title ({{ $language }}) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="trans[{{ $langCode }}][subtitle]" class="form-control"
+                                        value="{{ $subtitleValue }}" placeholder="Enter Sub Title in {{ $language }}">
+                                    @error("trans.$langCode.subtitle")
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @endforeach
+
                             {{-- Multilingual Content --}}
                             @foreach (langueses() as $langCode => $language)
                                 @php

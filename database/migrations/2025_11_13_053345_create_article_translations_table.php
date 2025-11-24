@@ -18,7 +18,8 @@ class CreateArticleTranslationsTable extends Migration
             $table->unsignedBigInteger('article_id'); 
             $table->string('lang_code');
 
-            $table->string('title'); 
+            $table->string('title')->nullable(); 
+            $table->string('subtitle')->nullable();
             $table->longText('content')->nullable(); 
     
             $table->timestamps(); 
