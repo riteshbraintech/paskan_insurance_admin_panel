@@ -40,6 +40,19 @@
                             @endforeach
 
                             @foreach (langueses() as $langCode => $language)
+                                <div class="col-md-6">
+                                    <label for="subtitle" class="form-label">Sub Title ({{ $language }}) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="trans[{{ $langCode }}][subtitle]" class="form-control"
+                                        id="subtitle" value="{{ old('trans.' . $langCode . '.subtitle') }}"
+                                        placeholder=" {{ __('Enter Sub Title in') . ' ' . $language }}">
+                                    @if ($errors->has('trans.' . $langCode . '.subtitle'))
+                                        <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.subtitle') }}</div>
+                                    @endif
+                                </div>
+                            @endforeach
+
+                            @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-12">
                                     <label for="content" class="form-label">Content ({{ $language }}) </label>
                                     <textarea name="trans[{{ $langCode }}][content]" id="trans_{{ $langCode }}_content"

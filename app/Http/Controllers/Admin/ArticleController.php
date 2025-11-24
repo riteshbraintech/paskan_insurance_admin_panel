@@ -48,10 +48,12 @@ class ArticleController extends Controller
         $request->validate([
             // --- English ---
             'trans.en.title' => 'required|string|max:255',
+            'trans.en.subtitle' => 'required|string|max:255',
             'trans.en.content' => 'required|string',
 
             // --- Thai ---
             'trans.th.title' => 'required|string|max:255',
+            'trans.th.subtitle' => 'required|string|max:255',
             'trans.th.content' => 'required|string',
 
             // --- Optional ---
@@ -61,11 +63,13 @@ class ArticleController extends Controller
         ], [
             // Custom error messages — English
             'trans.en.title.required' => 'The English title is required.',
+            'trans.en.subtitle.required' => 'The English Sub title is required.',
             'trans.en.title.max' => 'The English title must not exceed 255 characters.',
             'trans.en.content.required' => 'The English description is required.',
 
             // Custom error messages — Thai
             'trans.th.title.required' => 'The Thai title is required.',
+            'trans.th.subtitle.required' => 'The Thai Sub title is required.',
             'trans.th.title.max' => 'The Thai title must not exceed 255 characters.',
             'trans.th.content.required' => 'The Thai description is required.',
 
@@ -105,6 +109,7 @@ class ArticleController extends Controller
                 $bannerInfo->translations()->create([
                     'lang_code' => $langCode,
                     'title' => $trans['title'],
+                    'subtitle' =>$trans['subtitle'],
                     'content' => strip_tags($trans['content']),
                 ]);
             }
@@ -142,6 +147,7 @@ class ArticleController extends Controller
             return [$item->lang_code => [
                 'id' => $item->id,
                 'title' => $item->title,
+                'subtitle' => $item->subtitle,
                 'content' => $item->content,
                 ]];
         });
@@ -154,19 +160,23 @@ class ArticleController extends Controller
         $validatedData = $request->validate([
             // --- English ---
             'trans.en.title' => 'required|string|max:255',
+            'trans.en.subtitle' => 'required|string|max:255',
             'trans.en.content' => 'required|string',
 
             // --- Thai ---
             'trans.th.title' => 'required|string|max:255',
+            'trans.th.subtitle' => 'required|string|max:255',
             'trans.th.content' => 'required|string',
             // Optional field
             'is_active' => 'nullable|boolean',
         ], [
             'trans.en.title.required' => 'The English title is required.',
+            'trans.en.subtitle.required' => 'The English sub title is required.',
             'trans.en.title.max' => 'The English title must not exceed 255 characters.',
             'trans.en.content.required' => 'The English Content is required.',
             
             'trans.th.title.required' => 'The Thai title is required.',
+            'trans.th.subtitle.required' => 'The Thai sub title is required.',
             'trans.th.title.max' => 'The Thai title must not exceed 255 characters.',
             'trans.th.content.required' => 'The Thai Content is required.',
         ]);
@@ -209,6 +219,7 @@ class ArticleController extends Controller
                     ['lang_code' => $langCode],
                     [
                         'title' => $translationData['title'],
+                        'subtitle' => $translationData['subtitle'],
                         'content' => strip_tags( $translationData['content'] ?? ''),
                     ]
                 );
@@ -256,6 +267,7 @@ class ArticleController extends Controller
             return [$item->lang_code => [
                 'id' => $item->id,
                 'title' => $item->title,
+                'subtitle' => $item->subtitle,
                 'content' => $item->content,
                 ]];
         });

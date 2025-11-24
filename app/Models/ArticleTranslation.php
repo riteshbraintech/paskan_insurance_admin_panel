@@ -13,6 +13,7 @@ class ArticleTranslation extends Model
         'banner_id',
         'lang_code',
         'title',
+        'subtitle',
         'content',
     ];
 
