@@ -24,6 +24,7 @@ class CreateCategoryformfieldsTable extends Migration
             $table->json('images')->nullable();
             $table->json('options')->nullable();
             $table->boolean('is_required')->default(false);
+            $table->foreignId('parent_field_id')->nullable()->constrained('categoryformfields')->nullOnDelete();
             $table->integer('sort_order')->default(0)->comment('Used to sort fields in order');
             $table->timestamps();
         });
