@@ -18,7 +18,6 @@ class Article extends Model
         if ($this->image) {
             return asset('/public/admin/articles/img/' . $this->image);
         }
-        return asset('/public/admin/banners/img/default.png');
     }
 
     // create hasmany relationship with CMSPageTranslation

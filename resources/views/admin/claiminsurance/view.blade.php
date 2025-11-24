@@ -58,7 +58,7 @@
 
                         <tr>
                             <th width="25%">Description</th>
-                            <td>{{ $data['description'] }}</td>
+                            <td>{!! strip_tags($data['description']) !!}</td>
                         </tr>
 
                     </table>
