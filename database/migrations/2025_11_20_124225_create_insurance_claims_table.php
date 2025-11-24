@@ -17,7 +17,7 @@ class CreateInsuranceClaimsTable extends Migration
             $table->id();
             $table->foreignId('insurance_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->string('slug')->unique();
+            // $table->string('slug')->unique();
             $table->boolean('is_published')->default(1);
             $table->string('sort_order')->nullable();
             $table->timestamps();

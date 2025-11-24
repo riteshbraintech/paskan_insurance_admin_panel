@@ -31,11 +31,11 @@
         <thead class="table-secondary">
             <tr>
                 <th class="no-wrap">@sortablelink('sort_order', 'Sl No.')</th>
-                <th>Category</th>
+                <th>Insurance</th>
                 @foreach (langueses() as $langCode => $language)
-                    <th class="no-wrap">Label ({{ $language }})</th>
+                    <th class="no-wrap">Title ({{ $language }})</th>
                 @endforeach
-                <th class="no-wrap">Required</th>
+                <th class="no-wrap">Status</th>
                 <th class="no-wrap" width="100px">Action</th>
             </tr>
         </thead>
@@ -49,9 +49,9 @@
 
                     {{-- Category name --}}
                     @php
-                        $englishTitle = optional($item->category?->translations->where('lang_code', 'en')->first())
+                        $englishTitle = optional($item->insurance?->translations->where('lang_code', 'en')->first())
                             ->title;
-                        $defaultTitle = $item->category?->title ?? 'Unnamed';
+                        $defaultTitle = $item->insurance?->title ?? '';
                     @endphp
                     <td>{{ $englishTitle ?? $defaultTitle }}</td>
 
@@ -60,32 +60,32 @@
                         @php
                             $translation = $item->translations->where('lang_code', $langCode)->first();
                         @endphp
-                        <td>{{ $translation->label ?? 'N/A' }}</td>
+                        <td>{{ $translation->title ?? 'N/A' }}</td>
                     @endforeach
 
                     <td>
                         <span
-                            class="badge badge-{{ $item->is_required ? 'success' : 'danger' }} status-{{ $item->id }}"
+                            class="badge badge-{{ $item->is_published ? 'success' : 'danger' }} status-{{ $item->id }}"
                             onclick="changeStatus(event, {{ $item->id }})">
-                            {{ $item->is_required ? 'Yes' : 'No' }}
+                            {{ $item->is_published ? 'Yes' : 'No' }}
                         </span>
                     </td>
 
                     <td>
                         <div class="table-actions d-flex align-items-center gap-3 fs-6">
-                            <a href="{{ route('admin.categoryformfield.view', ['id' => $item->id]) }}"
+                            <a href="{{ route('admin.claiminsurance.view', ['id' => $item->id]) }}"
                                 class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
                                 data-bs-placement="bottom" title="View">
                                 <i class="fa-solid fa-eye fs-5"></i>
                             </a>
 
-                            <a href="{{ route('admin.categoryformfield.edit', ['id' => $item->id]) }}"
+                            <a href="{{ route('admin.claiminsurance.edit', ['id' => $item->id]) }}"
                                 class="text-warning" data-bs-toggle="tooltip" title="Edit">
                                 <i class="fa-solid fa-pen-to-square fs-5"></i>
                             </a>
 
                             <a href="javascript:void(0);"
-                                onclick="deleteItem('{{ route('admin.categoryformfield.delete', ['id' => $item->id]) }}')"
+                                onclick="deleteItem('{{ route('admin.claiminsurance.delete', ['id' => $item->id]) }}')"
                                 class="text-danger" data-bs-toggle="tooltip" title="Delete">
                                 <i class="fa-solid fa-trash fs-5"></i>
                             </a>
@@ -124,7 +124,7 @@
                     });
 
                     $.ajax({
-                        url: "{{ route('admin.categoryformfield.reorder') }}",
+                        url: "{{ route('admin.claiminsurance.reorder') }}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",

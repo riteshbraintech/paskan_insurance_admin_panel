@@ -29,7 +29,7 @@
     <table class="table align-middle" style="background-color:#8e8e8">
         <thead class="table-secondary">
             <tr>
-                <th class="no-wrap">@sortablelink('id', 'Sl.No.')</th>
+                <th class="no-wrap">@sortablelink('sort_order', 'Sl.No.')</th>
                 <th class="no-wrap">Slug</th>
                 @foreach (langueses() as $langCode => $language)
                     <th class="no-wrap">Title ({{ $language }}) </th>
@@ -38,10 +38,10 @@
                 <th class="no-wrap text-center" width="100px">Action</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="sortable">
             @forelse ($records as $key => $item)
 
-                <tr class="">
+                <tr data-id="{{ $item->id }}" class="sortable-row">
                     <td>{{ $item->sort_order }}</td>
                     <td>{{ $item->slug }}</td>
                   

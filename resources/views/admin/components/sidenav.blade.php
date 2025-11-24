@@ -185,7 +185,7 @@
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'contact' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.contact.index') }}">
-                    <i class="fa-solid fa-file-lines"></i>
+                    <i class="fa-solid fa-phone"></i>
                     <div class="menu-title">Contact Management</div>
                 </a>
             </li>
@@ -196,21 +196,21 @@
             <li class="categories {{ in_array($segment, ['insurance', 'claiminsurance']) ? 'mm-active' : '' }}">
                 <a href="javascript:void(0);"
                     class="has-arrow {{ in_array($segment, ['insurance', 'claiminsurance']) ? 'mm-active' : '' }}">
-                    <i class="fa-solid fa-folder-tree"></i>
+                    <i class="fa-solid fa-shield-halved"></i>
                     <div class="menu-title">Manage Insurance</div>
                 </a>
                 <ul
                     class="mm-collapse new-submenu {{ in_array($segment, ['insurance', 'claiminsurance']) ? 'mm-show' : '' }}">
                     <li class="{{ $segment == 'insurance' ? 'mm-active' : '' }}">
                         <a href="{{ route('admin.insurances.index') }}">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            Manage Insurances
+                            <i class="fa-solid fa-shield-heart"></i>
+                            Insurance
                         </a>
                     </li>
                     <li class="{{ $segment == 'claiminsurance' ? 'mm-active' : '' }}">
                         <a href="{{ route('admin.claiminsurance.index') }}">
-                            <i class="fa-solid fa-list-check"></i>
-                            Claim Insurances
+                            <i class="fa-solid fa-circle-question"></i>
+                            FAQs Claim Insurances
                         </a>
                     </li>
                 </ul>

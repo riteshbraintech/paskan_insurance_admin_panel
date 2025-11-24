@@ -15,13 +15,13 @@
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0 fw-bold">
-            <i class="fa-solid fa-eye text-info me-2"></i> View Category Page
+            <i class="fa-solid fa-eye text-info me-2"></i> View Contact Page
         </h4>
     </div>
 
     <!-- Translations -->
     <div class="card shadow-sm">
-        <div class="card-header bg-info text-white fw-bold">
+        {{-- <div class="card-header bg-info text-white fw-bold">
             Translations 
             @if($record->is_active)
                 <span class="badge bg-success">Active</span>
@@ -29,39 +29,33 @@
                 <span class="badge bg-danger">Inactive</span>
             @endif
             
-        </div>
+        </div> --}}
         <div class="card-body">
-            @forelse ($translations as $langCode => $data)
                 <div class="border rounded p-3 mb-4">
-                    <h5 class="fw-bold text-primary mb-3">
-                        <i class="fa-solid fa-language me-2"></i> {{ strtoupper($langCode) }} Translation
-                    </h5>
+                   
                     <table class="table table-bordered mb-0">
                         <tr>
-                            <th width="25%">Title</th>
-                            <td>{{ $data['title'] }}</td>
+                            <th width="25%">Full Name</th>
+                            <td>{{ $record->fullname }}</td>
                         </tr>
                         <tr>
-                            <th>Description</th>
-                            <td>{!! $data['description'] !!}</td>
+                            <th>Email</th>
+                            <td>{!! $record->email !!}</td>
                         </tr>
                         <tr>
-                            <th>Meta Title</th>
-                            <td>{{ $data['meta_title'] }}</td>
+                            <th>Phone Number</th>
+                            <td>{{ $record->phonenumber }}</td>
                         </tr>
                         <tr>
-                            <th>Meta Description</th>
-                            <td>{{ $data['meta_description'] }}</td>
+                            <th>Subject</th>
+                            <td>{{ $record->subject }}</td>
                         </tr>
                         <tr>
-                            <th>Meta Keywords</th>
-                            <td>{{ $data['meta_keywords'] }}</td>
+                            <th>Message</th>
+                            <td>{{ $record->message }}</td>
                         </tr>
                     </table>
                 </div>
-            @empty
-                <p class="text-muted">No translations available for this page.</p>
-            @endforelse
         </div>
     </div>
 

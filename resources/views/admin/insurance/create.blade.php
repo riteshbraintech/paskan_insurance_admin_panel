@@ -43,7 +43,7 @@
                                 <div class="col-md-12">
                                     <label for="description" class="form-label">Description ({{ $language }}) </label>
                                     <textarea name="trans[{{ $langCode }}][description]" id="trans_{{ $langCode }}_description"
-                                        class="form-control" cols="30" rows="10">{{ old('trans.' . $langCode . '.description') }}</textarea>
+                                        class="form-control" cols="30" rows="3">{{ old('trans.' . $langCode . '.description') }}</textarea>
                                     @if ($errors->has('trans.' . $langCode . '.description'))
                                         <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.description') }}
                                         </div>
@@ -71,7 +71,7 @@
     </div>
 @endsection
 
-@push('scripts')
+{{-- @push('scripts')
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -85,4 +85,4 @@
             @endforeach
         });
     </script>
-@endpush
+@endpush --}}

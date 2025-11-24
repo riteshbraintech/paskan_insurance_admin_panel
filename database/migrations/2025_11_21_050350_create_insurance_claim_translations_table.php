@@ -15,15 +15,16 @@ class CreateInsuranceClaimTranslationsTable extends Migration
     {
         Schema::create('insurance_claim_translations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('insurance_claims_id')->nullable();
+            $table->unsignedBigInteger('insurance_claim_id'); // FIXED
             $table->string('lang_code');
 
-            $table->string('title'); 
-            $table->longText('description')->nullable(); 
+            $table->string('title');
+            $table->longText('description')->nullable();
             $table->timestamps();
 
-            $table->foreign('insurance_claims_id')->references('id')->on('insurance_claims')->onDelete('cascade');
+            $table->foreign('insurance_claim_id')->references('id')->on('insurance_claims')->onDelete('cascade');
         });
+
     }
 
     /**
