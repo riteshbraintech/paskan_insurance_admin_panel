@@ -16,13 +16,9 @@ class CreateCategoryformfieldsTable extends Migration
         Schema::create('categoryformfields', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->string('label')->nullable();
-            $table->string('place_holder')->nullable();
             $table->string('name')->nullable();
             $table->string('type')->nullable();
             $table->string('optiontype')->nullable();
-            $table->json('images')->nullable();
-            $table->json('options')->nullable();
             $table->boolean('is_required')->default(false);
             $table->foreignId('parent_field_id')->nullable()->constrained('categoryformfields')->nullOnDelete();
             $table->integer('sort_order')->default(0)->comment('Used to sort fields in order');

@@ -62,7 +62,6 @@ class CategoryFormFieldController extends Controller
 
     public function create()
     {
-        $parentQuestion = Categoryformfield::with('translation')->get();
         $categories = Category::with('translation')->where('is_active', 1)->get();
         return view('admin.categoriesformfield.create', compact('categories'));
     }
