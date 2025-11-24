@@ -19,6 +19,7 @@ class ArticleResource extends JsonResource
             'title'         => $this->translation->title ?? $this->title,
             'subtitle'      => $this->translation->subtitle ?? $this->subtitle,
             'image_url'     => $this->image_url ?? null,
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
