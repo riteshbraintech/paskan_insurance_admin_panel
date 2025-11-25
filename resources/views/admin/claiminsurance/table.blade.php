@@ -46,14 +46,8 @@
                     <td>
                         {{ $item->sort_order }}
                     </td>
-
                     {{-- Category name --}}
-                    @php
-                        $englishTitle = optional($item->insurance?->translations->where('lang_code', 'en')->first())
-                            ->title;
-                        $defaultTitle = $item->insurance?->title ?? '';
-                    @endphp
-                    <td>{{ $englishTitle ?? $defaultTitle }}</td>
+                    <td>{{ $item->insurance?->translation->title ?? $defaultTitle }}</td>
 
                     {{-- Labels for each language --}}
                     @foreach (langueses() as $langCode => $language)

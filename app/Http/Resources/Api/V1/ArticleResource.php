@@ -18,8 +18,11 @@ class ArticleResource extends JsonResource
             'id'            => $this->id,
             'title'         => $this->translation->title ?? $this->title,
             'subtitle'      => $this->translation->subtitle ?? $this->subtitle,
+            'meta_title'      => $this->translation->meta_title ?? $this->meta_title,
+            'meta_description'      => $this->translation->meta_description ?? $this->meta_description,
+            'meta_keywords'      => $this->translation->meta_keywords ?? $this->meta_keywords,
             'image_url'     => $this->image_url ?? null,
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('d-M-Y'),
         ];
     }
 }

@@ -88,6 +88,39 @@
                                 </div>
                             @endforeach
 
+                            {{-- SEO Fields --}}
+                            @foreach (langueses() as $langCode => $language)
+                                @php
+                                    $metaTitle = old("trans.$langCode.meta_title", $translations[$langCode]['meta_title'] ?? '');
+                                    $metaKeywords = old("trans.$langCode.meta_keywords", $translations[$langCode]['meta_keywords'] ?? '');
+                                    $metaDescription = old("trans.$langCode.meta_description", $translations[$langCode]['meta_description'] ?? '');
+                                @endphp
+                                <div class="col-md-4">
+                                    <label class="form-label">Meta Title ({{ $language }})</label>
+                                    <input type="text" name="trans[{{ $langCode }}][meta_title]" class="form-control" value="{{ $metaTitle }}">
+                                    @error("trans.$langCode.meta_title")
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Meta Keywords ({{ $language }})</label>
+                                    <input type="text" name="trans[{{ $langCode }}][meta_keywords]" class="form-control" value="{{ $metaKeywords }}">
+                                    @error("trans.$langCode.meta_keywords")
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Meta Description ({{ $language }})</label>
+                                    <input type="text" name="trans[{{ $langCode }}][meta_description]" class="form-control" value="{{ $metaDescription }}">
+                                    @error("trans.$langCode.meta_description")
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @endforeach
+
+
                             {{-- Image --}}
                             <div class="mb-4">
                                 <label>Article Image</label><br>

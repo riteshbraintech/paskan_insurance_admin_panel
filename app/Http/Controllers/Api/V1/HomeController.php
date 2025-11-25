@@ -11,7 +11,11 @@ use App\Models\Banner;
 use App\Models\Categoryformfield;
 use App\Models\CMSPage;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
+use App\Http\Resources\Api\V1\HelpmenuResource;
+use App\Http\Resources\Api\V1\InsuranceClaimFAQResource;
 use App\Models\Contact;
+use App\Models\Insurance;
+use App\Models\InsuranceClaim;
 
 class HomeController extends Controller
 {
@@ -41,7 +45,8 @@ class HomeController extends Controller
          // Fetch banners as needed
         $testimonials = []; // Fetch testimonials as needed
         $insurances = []; // Fetch insurances as needed
-
+        $helpmenu= Insurance::with('translation')->where('is_published',1)->get(); //Fetch insurances for faqs
+        // dd($helpmenu);
         
         $payload = [
             'banners' => BannerResource::collection($banners),
@@ -49,6 +54,7 @@ class HomeController extends Controller
             'categories' => CategoryResource::collection($randomCategories),
             'testimonials' => $testimonials,
             'insurances' => $insurances,
+            'helpmenu' => HelpmenuResource::collection($helpmenu),
         ];
 
 
@@ -153,21 +159,23 @@ class HomeController extends Controller
     }
 
 
-    //get Category Form Fields By slug
-    // public function categoryfield($slug){
-    //     $category = Category::where('slug', $slug)->where('is_active', 1)->first();
-    //     $formFields = Categoryformfield::with('translation')->where('category_id', $category->id)->orderBy('sort_order', 'asc')->get();
+    //get Insurance Claim FAQs By Insurance slug
+    public function getinsuranceclaimfaqs($slug){
+        $insurance = Insurance::where('slug', $slug)->where('is_published', 1)->first();
+        $insuranceclaimfaqs = InsuranceClaim::with('translation')->where('insurance_id', $insurance->id)->where('is_published',1)->orderBy('sort_order', 'asc')->get();
         
-    //     return response()->json(
-    //         [
-    //             'status' => 'success',
-    //             'message' => 'Form Fields fetched successfully.',
-    //             'data' => $formFields ?? null,
-    //         ],
-    //         200
-    //     );
-    // }
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'Insurance Claim FAQs fetched successfully.',
+                'data' => InsuranceClaimFAQResource::collection($insuranceclaimfaqs),
+            ],
+            200
+        );
+    }
 
+
+    //Fetch Category Form Field by Slug
     public function categoryfield($slug)
     {
         $category = Category::where('slug', $slug)
@@ -186,6 +194,7 @@ class HomeController extends Controller
         ]);
     }
 
+    //Fetch The Contact Form and Saved
     public function contactform(Request $request)
     {
         $request->validate([

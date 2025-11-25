@@ -26,11 +26,12 @@ class Insurance extends Model
         $this->attributes['slug'] = Str::slug($this->attributes['title']);
     }
 
-    // create hasmany relationship with CMSPageTranslation
+    // create hasmany relationship with InsuranceTranslation
     public function translations()
     {
         return $this->hasMany(InsuranceTranslation::class, 'insurance_id');
     }
+
 
     // crate a hasOne realtion to get translation in current app locale
     public function translation()

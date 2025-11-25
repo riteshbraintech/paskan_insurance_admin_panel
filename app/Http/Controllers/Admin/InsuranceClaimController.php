@@ -106,7 +106,7 @@ class InsuranceClaimController extends Controller
                     'insurance_claim_id' => $field->id,
                     'lang_code' => $lang,
                     'title' => $data['title'],
-                    'description' => $data['description'],
+                    'description' =>strip_tags($data['description']),
                 ]);
             }
 
@@ -194,7 +194,6 @@ class InsuranceClaimController extends Controller
             // ---------------------- UPDATE MAIN RECORD ----------------------
             $field->update([
                 'title' => $request->trans['en']['title'],
-                'description' => $request->trans['en']['description'],
             ]);
 
 
@@ -208,7 +207,7 @@ class InsuranceClaimController extends Controller
                     ],
                     [
                         'title' => $translation['title'] ?? null,
-                        'description' => $translation['description'] ?? null,
+                        'description' => strip_tags($translation['description'] ?? null),
                     ]
                 );
             }

@@ -44,15 +44,9 @@
                         <select id="insuranceFilter" name="insurance_id" class="form-select">
                             <option value="">-- Filter by Insurance --</option>
                             @foreach ($insurances as $insurance)
-                                @php
-                                    $lang = app()->getLocale() ?? 'en';
-                                    $translation = $insurance->translations->where('lang_code', $lang)->first();
-                                    if (!$translation) {
-                                        $translation = $insurance->translations->first();
-                                    }
-                                    $insuranceName = $translation->title ?? ($insurance->title ?? 'Unnamed');
-                                @endphp
-                                <option value="{{ $insurance->id }}">{{ $insuranceName }}</option>
+                                <option value="{{ $insurance->id }}">
+                                    {{ $insurance->translation->title }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -74,7 +68,7 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('public/admin/js/common.js') }}"></script>
+    <script src="{{ asset('public/admin/js/common.js') }}"></script>
     <script>
         function changeStatus(event, id) {
             let url = "{{ route('admin.claiminsurance.change.status') }}" + "/" + id;
@@ -108,7 +102,7 @@
                     showFlashMessage('error', 'Server error occurred.');
                 }
             });
-        }        
+        }
     </script>
 
     <script>

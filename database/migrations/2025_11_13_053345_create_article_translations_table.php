@@ -21,6 +21,10 @@ class CreateArticleTranslationsTable extends Migration
             $table->string('title')->nullable(); 
             $table->string('subtitle')->nullable();
             $table->longText('content')->nullable(); 
+
+            $table->string('meta_title')->nullable();
+            $table->string('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
     
             $table->timestamps(); 
             $table->softDeletes(); 
