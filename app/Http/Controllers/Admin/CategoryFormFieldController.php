@@ -14,6 +14,7 @@ use App\Models\CategoryFieldFormOptions;
 use App\Models\CategoryFieldFormOptionsTranslation;
 use App\Models\Option;
 use App\Models\OptionTranslation;
+use App\Http\Requests\Admin\CategoryFormFieldOptionsRequest;
 
 class CategoryFormFieldController extends Controller
 {
@@ -287,7 +288,8 @@ class CategoryFormFieldController extends Controller
     // view form filed value and question
     public function viewOptions(Request $request, $id){
 
-        $mainForm =  CategoryFormField::with(['parent','parent.translation', 'translation'])->findOrFail($id);
+        $mainForm =  CategoryFormField::with(['parent','options','options.translations','parent.translation', 'translation'])->findOrFail($id);
+        // dd($mainForm);
         $record = Categoryformfield::with('translations')->findOrFail($id);
         return view('admin.categoriesformfield.form-options', compact('mainForm', 'record'));
     }
@@ -300,8 +302,10 @@ class CategoryFormFieldController extends Controller
         
     }
 
-    public function optionstore(Request $request)
+    public function optionstore(CategoryFormFieldOptionsRequest $request)
     {
+
+        // dd($request->all());
         DB::beginTransaction();
 
         try {
@@ -315,60 +319,50 @@ class CategoryFormFieldController extends Controller
                 'field_id' => $request->field_id,
                 'value'    => $request->value,
                 'order'    => $newSortOrder,
+                'parent_option_id' => $request->has('parent_option_id') ? $request->parent_option_id : null,
             ]);
 
-            /**
-             * STEP 1: MULTIPLE IMAGE UPLOAD
-             */
-            $uploadedImages = [];
-
-            if ($request->hasFile('image')) {
-
-                foreach ($request->file('image') as $img) {
-
-                    $fileName = time() . '-' . uniqid() . '.' . $img->getClientOriginalExtension();
-
-                    // store in storage/app/public/form_options
-                    $img->storeAs('public/form_options', $fileName);
-
-                    $uploadedImages[] = $fileName;
-                }
-            }
-
-            // Save images in option record (recommended JSON)
-            if (!empty($uploadedImages)) {
-                $option->update([
-                    'images' => json_encode($uploadedImages)
-                ]);
-            }
 
             /**
              * STEP 2: Create translations
              */
-            foreach ($request->trans as $lang => $data) {
+            if($request->has('trans') && is_array($request->trans) && count($request->trans) > 0){   
+                foreach ($request->trans as $lang => $data) {
+                    $imageName = '';
+                    if(!empty($data['images'])){
+                        // find image in uploadedImages array based on lang key
+                        $img = $data['images'];
+                        $fileName = time() . '-' . uniqid() . '.' . $img->getClientOriginalExtension();
+                        $img->storeAs('public/form_options', $fileName);    // store in storage/app/public/form_options
+                        $imageName = $fileName;
+                    }
 
-                CategoryFieldFormOptionsTranslation::create([
-                    'option_id' => $option->id,
-                    'lang_code' => $lang,
-                    'label'     => $data['label'],
-                ]);
+                    CategoryFieldFormOptionsTranslation::create([
+                        'option_id' => $option->id,
+                        'lang_code' => $lang,
+                        'label'     => $data['label'],
+                        'image' => $imageName,
+                    ]);
+                }
             }
 
 
             DB::commit();
 
-            return redirect()
-                ->route('admin.categoryformfield.index')
-                ->with('success', 'Field option created successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Option created successfully.'
+            ]);
 
         } catch (\Throwable $th) {
 
             DB::rollBack();
             \Log::alert("Error in Store: " . $th->getMessage());
 
-            return redirect()
-                ->route('admin.categoryformfield.index')
-                ->with('danger', 'Something went wrong');
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
         }
     }
 
