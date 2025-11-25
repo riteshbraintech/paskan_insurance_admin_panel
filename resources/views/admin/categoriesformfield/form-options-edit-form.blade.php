@@ -11,7 +11,7 @@
                 placeholder="Enter label in {{ $language }}">
             @if ($errors->has('trans.' . $langCode . '.label'))
                 <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.label') }}
-                </div>
+                </div>       
             @endif
         </div>
     @endforeach
