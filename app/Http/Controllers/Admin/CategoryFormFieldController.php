@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 use App\Http\Requests\Admin\CategoryFormFieldsRequest;
+use App\Models\CategoryFieldFormOptions;
+use App\Models\CategoryFieldFormOptionsTranslation;
+use App\Models\Option;
+use App\Models\OptionTranslation;
 
 class CategoryFormFieldController extends Controller
 {
@@ -294,6 +298,78 @@ class CategoryFormFieldController extends Controller
         $record = Categoryformfield::with('translations')->findOrFail($id);
         return view('admin.categoriesformfield.form-options-edit-form', compact('mainForm', 'record'));
         
+    }
+
+    public function optionstore(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            // Compute sort order
+            $lastOrder = CategoryFormField::max('sort_order');
+            $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
+
+            // Create option record
+            $option = CategoryFieldFormOptions::create([
+                'field_id' => $request->field_id,
+                'value'    => $request->value,
+                'order'    => $newSortOrder,
+            ]);
+
+            /**
+             * STEP 1: MULTIPLE IMAGE UPLOAD
+             */
+            $uploadedImages = [];
+
+            if ($request->hasFile('image')) {
+
+                foreach ($request->file('image') as $img) {
+
+                    $fileName = time() . '-' . uniqid() . '.' . $img->getClientOriginalExtension();
+
+                    // store in storage/app/public/form_options
+                    $img->storeAs('public/form_options', $fileName);
+
+                    $uploadedImages[] = $fileName;
+                }
+            }
+
+            // Save images in option record (recommended JSON)
+            if (!empty($uploadedImages)) {
+                $option->update([
+                    'images' => json_encode($uploadedImages)
+                ]);
+            }
+
+            /**
+             * STEP 2: Create translations
+             */
+            foreach ($request->trans as $lang => $data) {
+
+                CategoryFieldFormOptionsTranslation::create([
+                    'option_id' => $option->id,
+                    'lang_code' => $lang,
+                    'label'     => $data['label'],
+                ]);
+            }
+
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.categoryformfield.index')
+                ->with('success', 'Field option created successfully.');
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+            \Log::alert("Error in Store: " . $th->getMessage());
+
+            return redirect()
+                ->route('admin.categoryformfield.index')
+                ->with('danger', 'Something went wrong');
+        }
     }
 
 

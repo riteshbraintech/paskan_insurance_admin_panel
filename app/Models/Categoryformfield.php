@@ -37,6 +37,13 @@ class Categoryformfield extends Model
         return $this->hasOne(Categoryformfield::class, 'id','parent_field_id');
     }
 
+    public function options()
+    {
+        return $this->hasMany(CategoryFieldFormOptions::class,'field_id','id');
+    }
+    
+
+
     
 }
 

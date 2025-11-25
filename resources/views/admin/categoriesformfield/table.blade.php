@@ -53,7 +53,7 @@
                     <td>{{ $item->translation?->label ?? 'N/A' }}</td>
                     <td>{{ ucfirst($item->type ?? 'N/A') }}</td>
 
-                    <td>
+                    {{-- <td>
                         <div class="table-actions d-flex align-items-center gap-3 fs-6">
                             <a href="{{ route('admin.categoryformfield.view', ['id' => $item->id]) }}"
                                 class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
@@ -65,6 +65,23 @@
                                 class="text-warning" data-bs-toggle="tooltip" title="Edit Options">
                                 <i class="fa-solid fa-pen-to-square fs-5"></i>
                             </a>
+                        </div>
+                    </td> --}}
+                    <td>
+                        <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                            {{-- Show 2 buttons ONLY if type is select or checkbox --}}
+                            @if (in_array($item->type, ['select', 'checkbox','radio']))
+                                <a href="{{ route('admin.categoryformfield.view', ['id' => $item->id]) }}"
+                                    class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom" title="View">
+                                    <i class="fa-solid fa-eye fs-5"></i>
+                                </a>
+
+                                <a href="{{ route('admin.categoryformfield.viewOptions', ['id' => $item->id]) }}"
+                                    class="text-warning" data-bs-toggle="tooltip" title="Edit Options">
+                                    <i class="fa-solid fa-pen-to-square fs-5"></i>
+                                </a>
+                            @endif
                         </div>
                     </td>
 

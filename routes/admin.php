@@ -186,7 +186,7 @@ Route::prefix('/admin')->group(function () {
             Route::post('reorder', [CategoryFormFieldController::class, 'reorder'])->name('admin.categoryformfield.reorder');
             Route::get('view-update-options/{id}', [CategoryFormFieldController::class, 'viewOptions'])->name('admin.categoryformfield.viewOptions');
             Route::get('edit-update-options-form/{id}', [CategoryFormFieldController::class, 'editOptionsForm'])->name('admin.categoryformfield.editOptionsForm');
-            
+            Route::post('optionstore', [CategoryFormFieldController::class, 'optionstore'])->name('admin.categoryformfieldoptions.optionstore');
 
         });
 
