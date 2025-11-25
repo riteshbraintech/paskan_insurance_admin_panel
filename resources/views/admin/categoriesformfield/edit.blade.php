@@ -41,6 +41,12 @@
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="trans[{{ $lang }}][label]"
                                         value="{{ old("trans.$lang.label", $translations[$lang]['label'] ?? '') }}">
+                                    
+                                        @if ($errors->has('trans.' . $lang . '.label'))
+                                        <div class="text-danger">{{ $errors->first('trans.' . $lang . '.label') }}
+                                        </div>
+                                    @endif
+
                                 </div>
                             @endforeach
 
@@ -61,76 +67,48 @@
                                 <label class="form-label">Field Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="name"
                                     value="{{ old('name', $record->name) }}">
+                                
+                                @error('name')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+
                             </div>
 
 
                             {{-- ==================== FIELD TYPE ==================== --}}
                             <div class="col-md-4">
                                 <label class="form-label">Field Type <span class="text-danger">*</span></label>
-                                <select name="type" id="type" class="form-control">
-                                    <option value="text" {{ $record->type == 'text' ? 'selected' : '' }}>Text</option>
-                                    <option value="number" {{ $record->type == 'number' ? 'selected' : '' }}>Number
-                                    </option>
-                                    <option value="select" {{ $record->type == 'select' ? 'selected' : '' }}>Select
-                                    </option>
-                                    <option value="checkbox" {{ $record->type == 'checkbox' ? 'selected' : '' }}>Checkbox
-                                    </option>
-                                    <option value="radio" {{ $record->type == 'radio' ? 'selected' : '' }}>Radio</option>
-                                    <option value="textarea" {{ $record->type == 'textarea' ? 'selected' : '' }}>Textarea
-                                    </option>
+                                @php
+                                    $fieldArry = ['text', 'number', 'select','checkbox','radio','textarea'];
+                                @endphp
+                                <select name="type" id="type" class="form-select">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach ($fieldArry  as $fieldname)
+                                        <option value="{{$fieldname}}" {{ old('type', $record->type) == $fieldname ? 'selected' : '' }}>
+                                            {{ ucfirst($fieldname)}}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
-
-                            {{-- ==================== OPTIONS (MULTI-LANG) ==================== --}}
-                            <div id="textOptionsWrapper" class="col-md-12" style="display:none;">
-                                @foreach (langueses() as $lang => $language)
-                                    <div class="mb-3">
-                                        <label class="form-label">Options ({{ $language }}) </label>
-                                        <textarea name="trans[{{ $lang }}][options]" class="form-control">{{ old("trans.$lang.options", $translations[$lang]['options'] ?? '') }}</textarea>
-                                    </div>
-                                @endforeach
+                            {{-- Main Parent Dropdown --}}
+                            <div class="col-md-4">
+                                <label for="parent_field_id" class="form-label">Select Parent Form Question <span
+                                        class="text-danger">*</span></label>
+                                <select name="parent_field_id" id="parent_field_id" class="form-control">
+                                    <option value="">-- Select Parent Form Question --</option>
+                                    @foreach ($parentQuestion as $que)
+                                        <option value="{{ $que->id }}"
+                                            {{ old('parent_field_id', $record->parent_field_id) == $que->id ? 'selected' : '' }}>
+                                            {{ $que->translation->label ?? 'Unnamed' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('parent_field_id')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
-
-                            {{-- ==================== IMAGE OPTIONS ==================== --}}
-                            <div id="imageOptionsWrapper" class="col-md-12" style="display:none;">
-                                <label class="form-label">Upload Option Images</label>
-                                <input type="file" name="option_images[]" multiple class="form-control mb-2"
-                                    id="optionImagesInput">
-
-                                <small class="text-muted">
-                                    The number of images must match number of options (primary language).
-                                </small>
-
-                                {{-- NEW PREVIEWS --}}
-                                <div id="imagePreview" class="d-flex flex-wrap gap-2 mt-2"></div>
-
-
-                                {{-- EXISTING IMAGES --}}
-                                @if (!empty($record->images))
-                                    @php
-                                        $imagesArray = $record->images ?? [];
-                                    @endphp
-
-
-                                    <div class="d-flex flex-wrap gap-2 mt-2" id="existingImages">
-                                        @foreach ($imagesArray as $img)
-                                            <div class="position-relative image-box">
-                                                <img src="{{ asset('public/' . $img) }}" class="img-thumbnail"
-                                                    style="width:80px;height:80px;object-fit:cover;">
-
-                                                <button type="button" class="remove-existing-image btn btn-danger btn-sm"
-                                                    data-img="{{ $img }}"
-                                                    style="position:absolute; top:-8px; right:-8px; border-radius:50%; padding:2px 6px;">
-                                                    &times;
-                                                </button>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                            </div>
 
                             <div class="col-12 mt-2">
                                 <button class="btn btn-success px-5">Update</button>

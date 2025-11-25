@@ -32,9 +32,9 @@
             <tr>
                 <th class="no-wrap">@sortablelink('sort_order', 'Sl No.')</th>
                 <th>Category</th>
-                @foreach (langueses() as $langCode => $language)
-                    <th class="no-wrap">Label ({{ $language }})</th>
-                @endforeach
+                <th>Field Label</th>
+                <th>HTML Type</th>
+                <th>Av. Options</th>
                 <th class="no-wrap">Required</th>
                 <th class="no-wrap" width="100px">Action</th>
             </tr>
@@ -48,20 +48,25 @@
                     </td>
 
                     {{-- Category name --}}
-                    @php
-                        $englishTitle = optional($item->category?->translations->where('lang_code', 'en')->first())
-                            ->title;
-                        $defaultTitle = $item->category?->title ?? '';
-                    @endphp
-                    <td>{{ $englishTitle ?? $defaultTitle }}</td>
+                    <td>{{ $item->category->translation->title ?? 'N/A' }}</td>
 
-                    {{-- Labels for each language --}}
-                    @foreach (langueses() as $langCode => $language)
-                        @php
-                            $translation = $item->translations->where('lang_code', $langCode)->first();
-                        @endphp
-                        <td>{{ $translation->label ?? 'N/A' }}</td>
-                    @endforeach
+                    <td>{{ $item->translation?->label ?? 'N/A' }}</td>
+                    <td>{{ ucfirst($item->type ?? 'N/A') }}</td>
+
+                    <td>
+                        <div class="table-actions d-flex align-items-center gap-3 fs-6">
+                            <a href="{{ route('admin.categoryformfield.view', ['id' => $item->id]) }}"
+                                class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="View">
+                                <i class="fa-solid fa-eye fs-5"></i>
+                            </a>
+
+                            <a href="{{ route('admin.categoryformfield.viewOptions', ['id' => $item->id]) }}"
+                                class="text-warning" data-bs-toggle="tooltip" title="Edit Options">
+                                <i class="fa-solid fa-pen-to-square fs-5"></i>
+                            </a>
+                        </div>
+                    </td>
 
                     <td>
                         <span

@@ -184,6 +184,9 @@ Route::prefix('/admin')->group(function () {
             Route::get('view/{id?}', [CategoryFormFieldController::class, 'view'])->name('admin.categoryformfield.view');
             Route::get('filter', [CategoryFormFieldController::class, 'filter'])->name('admin.categoryformfield.filter');
             Route::post('reorder', [CategoryFormFieldController::class, 'reorder'])->name('admin.categoryformfield.reorder');
+            Route::get('view-update-options/{id}', [CategoryFormFieldController::class, 'viewOptions'])->name('admin.categoryformfield.viewOptions');
+            Route::get('edit-update-options-form/{id}', [CategoryFormFieldController::class, 'editOptionsForm'])->name('admin.categoryformfield.editOptionsForm');
+            
 
         });
 

@@ -26,19 +26,36 @@
                             class="row g-3 needs-validation" enctype="multipart/form-data">
                             @csrf
                             {{-- Category Dropdown --}}
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="category_id" class="form-label">Select Category <span
                                         class="text-danger">*</span></label>
                                 <select name="category_id" id="category_id" class="form-control">
                                     <option value="">-- Select Category --</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}"
-                                            {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ old('category_id', request()->get('catId')) == $category->id ? 'selected' : '' }}>
                                             {{ $category->translation->title ?? 'Unnamed' }}
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('category_id')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            {{-- Main Parent Dropdown --}}
+                            <div class="col-md-6">
+                                <label for="parent_field_id" class="form-label">Select Parent Form Question <span
+                                        class="text-danger">*</span></label>
+                                <select name="parent_field_id" id="parent_field_id" class="form-control">
+                                    <option value="">-- Select Parent Form Question --</option>
+                                    @foreach ($parentQuestion as $que)
+                                        <option value="{{ $que->id }}"
+                                            {{ old('parent_field_id') == $que->id ? 'selected' : '' }}>
+                                            {{ $que->translation->label ?? 'Unnamed' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('parent_field_id')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -95,17 +112,16 @@
                                 <label for="type" class="form-label">
                                     Field Type <span class="text-danger">*</span>
                                 </label>
-
+                                @php
+                                    $fieldArry = ['text', 'number', 'select','checkbox','radio','textarea'];
+                                @endphp
                                 <select name="type" id="type" class="form-select">
                                     <option value="">-- Select Type --</option>
-                                    <option value="text" {{ old('type') == 'text' ? 'selected' : '' }}>Text</option>
-                                    <option value="number" {{ old('type') == 'number' ? 'selected' : '' }}>Number</option>
-                                    <option value="select" {{ old('type') == 'select' ? 'selected' : '' }}>Select</option>
-                                    <option value="checkbox" {{ old('type') == 'checkbox' ? 'selected' : '' }}>Checkbox
-                                    </option>
-                                    <option value="radio" {{ old('type') == 'radio' ? 'selected' : '' }}>Radio</option>
-                                    <option value="textarea" {{ old('type') == 'textarea' ? 'selected' : '' }}>Textarea
-                                    </option>
+                                    @foreach ($fieldArry  as $fieldname)
+                                        <option value="{{$fieldname}}" {{ old('type') == $fieldname ? 'selected' : '' }}>
+                                            {{ ucfirst($fieldname)}}
+                                        </option>
+                                    @endforeach
                                 </select>
 
                                 @error('type')
@@ -113,43 +129,25 @@
                                 @enderror
                             </div>
 
-                            {{-- MULTILINGUAL OPTIONS --}}
-                            <div id="textOptionsWrapper" class="options-wrapper" style="display:none;">
-                                @foreach (langueses() as $langCode => $language)
-                                    <div class="col-md-12 mb-3">
-
-                                        <label for="options_{{ $langCode }}" class="form-label">
-                                            Options ({{ $language }})
-                                        </label>
-
-                                        <textarea name="trans[{{ $langCode }}][options]" id="options_{{ $langCode }}" class="form-control"
-                                            rows="2" placeholder='["Red", "Blue"]'>{{ old('trans.' . $langCode . '.options') }}</textarea>
-
-                                        @if ($errors->has('trans.' . $langCode . '.options'))
-                                            <div class="text-danger">
-                                                {{ $errors->first('trans.' . $langCode . '.options') }}</div>
-                                        @endif
-
-                                    </div>
-                                @endforeach
+                            <div class="col-md-4">
+                                <label for="is_required" class="form-label">
+                                    Is Required ? <span class="text-danger">*</span>
+                                </label>
+                                @php
+                                    $fieldArry = [0=>'No', 1=>'Yes'];
+                                @endphp
+                                <select name="is_required" id="is_required" class="form-control">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach ($fieldArry  as $key => $fieldname)
+                                        <option value="{{$key}}" {{ old('is_required') == $key ? 'selected' : '' }}>
+                                            {{ ucfirst($fieldname)}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('is_required')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
-
-                            {{-- ONE IMAGE UPLOAD FOR ALL LANGUAGES --}}
-                            <div id="imageOptionsWrapper" style="display:none;">
-                                <label class="form-label">Upload Images For Options (All Languages)</label>
-                                <input type="file" name="option_images[]" class="form-control mb-2" multiple
-                                    id="optionImagesInput">
-
-                                <small class="text-muted">
-                                    Upload images once. Same images apply to all languages.
-                                    Number of images must match number of options in primary language.
-                                </small>
-
-                                {{-- Preview container --}}
-                                <div id="imagePreview" class="mt-3 d-flex flex-wrap gap-2"></div>
-                            </div>
-
-
 
                             {{-- Buttons --}}
                             <div class="col-12">
@@ -255,6 +253,23 @@
                 });
                 document.getElementById('optionImagesInput').files = dataTransfer.files;
             }
+
+
+            // handle on changes and reload all the data
+            $('#category_id').on('change', function () {
+                let value = $(this).val();
+
+                const params = new URLSearchParams(window.location.search);
+
+                // Add/update parameters
+                params.set("catId", value); 
+                // Build updated URL
+                const newUrl = window.location.pathname + '?' + params.toString();
+
+                // Redirect to new URL
+                window.location.href = newUrl;
+            });
+
 
         });
     </script>
