@@ -22,7 +22,7 @@ class CategoryFieldFormOptionsTranslation extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image) {
-            return asset('/public/form_options/' . $this->image);
+            return asset('/public/admin/form_options/' . $this->image);
         }
         return asset('/public/admin/banners/img/default.png');
     }

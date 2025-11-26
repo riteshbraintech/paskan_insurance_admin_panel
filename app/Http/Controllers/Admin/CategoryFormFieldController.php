@@ -15,6 +15,7 @@ use App\Models\CategoryFieldFormOptionsTranslation;
 use App\Models\Option;
 use App\Models\OptionTranslation;
 use App\Http\Requests\Admin\CategoryFormFieldOptionsRequest;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryFormFieldController extends Controller
 {
@@ -304,12 +305,10 @@ class CategoryFormFieldController extends Controller
 
     public function optionstore(CategoryFormFieldOptionsRequest $request)
     {
-
         // dd($request->all());
         DB::beginTransaction();
 
         try {
-
             // Compute sort order
             $lastOrder = CategoryFormField::max('sort_order');
             $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
@@ -322,20 +321,28 @@ class CategoryFormFieldController extends Controller
                 'parent_option_id' => $request->has('parent_option_id') ? $request->parent_option_id : null,
             ]);
 
-
             /**
              * STEP 2: Create translations
              */
             if($request->has('trans') && is_array($request->trans) && count($request->trans) > 0){   
                 foreach ($request->trans as $lang => $data) {
-                    $imageName = '';
-                    if(!empty($data['images'])){
-                        // find image in uploadedImages array based on lang key
-                        $img = $data['images'];
-                        $fileName = time() . '-' . uniqid() . '.' . $img->getClientOriginalExtension();
-                        $img->storeAs('public/form_options', $fileName);    // store in storage/app/public/form_options
-                        $imageName = $fileName;
-                    }
+                        $imageName = null;
+
+                        if (!empty($data['images'])) {
+                            $img = $data['images'];
+
+                            // Define upload path
+                            $uploadPath = public_path('admin/form_options/');
+                            
+                            // Create folder if it doesn't exist
+                            if (!file_exists($uploadPath)) {
+                                mkdir($uploadPath, 0777, true);
+                            }
+                            $imageName = time() . '.' . $img->getClientOriginalExtension();
+
+                            $img->move($uploadPath, $imageName);
+                        }
+
 
                     CategoryFieldFormOptionsTranslation::create([
                         'option_id' => $option->id,
@@ -346,18 +353,102 @@ class CategoryFormFieldController extends Controller
                 }
             }
 
-
+            $mainForm =  CategoryFormField::with(['parent','options','options.translations','parent.translation', 'translation'])->findOrFail($request->field_id);
+             $parentOptions = $mainForm->parent->options ?? [];
+             $optionsDeatil = collect($option->translations()->get())->keyBy('lang_code')->map(function($item){
+                                            return $item;
+                                        })->toArray();
+            $html=view('admin.categoriesformfield.form-line-options',['optionsDeatil'=>$optionsDeatil,'option'=>$option,'mainForm'=>$mainForm,'parentOptions'=>$parentOptions])->render();
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Option created successfully.'
+                'message' => 'Option created successfully.',
+                'option_id' => $option->id,
+                'html'=>$html,
             ]);
 
         } catch (\Throwable $th) {
 
             DB::rollBack();
+            dd($th);
             \Log::alert("Error in Store: " . $th->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Option created failed.',
+                'html'=>'',
+            ]);
+
+        }
+    }
+
+
+    public function optionupdate(CategoryFormFieldOptionsRequest $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            // Find existing option
+            $option = CategoryFieldFormOptions::findOrFail($id);
+
+            // Update option basic values
+            $option->update([
+                'value' => $request->value,
+                'parent_option_id' => $request->has('parent_option_id') ? $request->parent_option_id : $option->parent_option_id,
+            ]);
+
+            /**
+             * STEP 2: Update translations
+             */
+            if ($request->has('trans') && is_array($request->trans)) {
+
+                foreach ($request->trans as $lang => $data) {
+
+                    $translation = CategoryFieldFormOptionsTranslation::where('option_id', $option->id)
+                        ->where('lang_code', $lang)
+                        ->first();
+
+                    if ($translation) {
+                        $translation->label = $data['label'] ?? $translation->label;
+
+                        // Update image if provided
+                        if (!empty($data['images'])) {
+                            $img = $data['images'];
+
+                            $uploadPath = public_path('admin/form_options/');
+                            
+                            if (!file_exists($uploadPath)) {
+                                mkdir($uploadPath, 0777, true);
+                            }
+
+                            $fileName = time() . '.' . $img->getClientOriginalExtension();
+
+                            // Move uploaded file to the folder
+                            $img->move($uploadPath, $fileName);
+
+                            // Assign new file name to translation
+                            $translation->image = $fileName;
+                        }
+
+                        $translation->save();
+                    }
+
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Option updated successfully.'
+            ]);
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+            \Log::alert("Error in Update: " . $th->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -365,6 +456,22 @@ class CategoryFormFieldController extends Controller
             ]);
         }
     }
+
+    public function deleteOption($id)
+    {
+        // dd($id);
+        $option = CategoryFieldFormOptions::findOrFail($id);
+
+        // delete translations first
+        CategoryFieldFormOptionsTranslation::where('option_id', $id)->delete();
+
+        
+        // delete main option
+        $option->delete();
+
+        return response()->json(['success' => true, 'message' => 'Option deleted']);
+    }
+
 
 
 }
