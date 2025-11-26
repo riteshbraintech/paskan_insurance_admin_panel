@@ -1,4 +1,17 @@
 <tr data-id="{{ $option->id }}">
+    @php
+        $optionsDeatil = collect($option->translations()->get())
+            ->keyBy('lang_code')
+            ->map(function ($item) {
+                return $item;
+            })
+            ->toArray();
+
+        $parentOptions = $mainForm->parent->options ?? [];
+
+        $optionIdsss = isset($option->optionIds) ? $option->optionIds()->pluck('id')->toArray() : [];
+
+    @endphp
 
     @foreach (langueses() as $langCode => $language)
         <td>
@@ -28,15 +41,16 @@
 
     @if ($mainForm->parent)
         <td>
-            <select name="parent_option_id" id="parent_option_id">
+            <select name="parent_option_id"  class="form-select" multiple>
                 @foreach ($parentOptions as $parentOption)
                     <option value="{{ $parentOption->id }}"
-                        {{ $parentOption->id == $option->parent_option_id ? 'selected' : '' }}>
+                        {{ in_array($parentOption->id, $optionIdsss) ? 'selected' : '' }}>
                         {{ $parentOption->translation->label ?? 'N/A' }}
                     </option>
                 @endforeach
             </select>
         </td>
+
     @endif
 
 
@@ -55,3 +69,6 @@
         </div>
     </td>
 </tr>
+
+
+

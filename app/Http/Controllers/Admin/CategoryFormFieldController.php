@@ -289,7 +289,7 @@ class CategoryFormFieldController extends Controller
     // view form filed value and question
     public function viewOptions(Request $request, $id){
 
-        $mainForm =  CategoryFormField::with(['parent','options','options.translations','parent.translation', 'translation'])->findOrFail($id);
+        $mainForm =  CategoryFormField::with(['options.optionIds','parent','options','options.translations','parent.translation', 'translation'])->findOrFail($id);
         // dd($mainForm);
         $record = Categoryformfield::with('translations')->findOrFail($id);
         return view('admin.categoriesformfield.form-options', compact('mainForm', 'record'));
@@ -297,7 +297,7 @@ class CategoryFormFieldController extends Controller
 
     // edit Options Form
     public function editOptionsForm(Request $request, $id){
-        $mainForm =  CategoryFormField::with(['parent','parent.translation', 'translation'])->findOrFail($id);
+        $mainForm =  CategoryFormField::with(['options.optionIds','parent','parent.translation', 'translation'])->findOrFail($id);
         $record = Categoryformfield::with('translations')->findOrFail($id);
         return view('admin.categoriesformfield.form-options-edit-form', compact('mainForm', 'record'));
         
@@ -318,8 +318,13 @@ class CategoryFormFieldController extends Controller
                 'field_id' => $request->field_id,
                 'value'    => $request->value,
                 'order'    => $newSortOrder,
-                'parent_option_id' => $request->has('parent_option_id') ? $request->parent_option_id : null,
             ]);
+
+            if($request->has('parent_option_id') && !empty($request->parent_option_id)){
+                $idsss = explode(',',$request->parent_option_id);
+                $option->optionIds()->sync($idsss);
+                // dd($option->optionIds);
+            }
 
             /**
              * STEP 2: Create translations
@@ -353,12 +358,8 @@ class CategoryFormFieldController extends Controller
                 }
             }
 
-            $mainForm =  CategoryFormField::with(['parent','options','options.translations','parent.translation', 'translation'])->findOrFail($request->field_id);
-             $parentOptions = $mainForm->parent->options ?? [];
-             $optionsDeatil = collect($option->translations()->get())->keyBy('lang_code')->map(function($item){
-                                            return $item;
-                                        })->toArray();
-            $html=view('admin.categoriesformfield.form-line-options',['optionsDeatil'=>$optionsDeatil,'option'=>$option,'mainForm'=>$mainForm,'parentOptions'=>$parentOptions])->render();
+            $mainForm =  CategoryFormField::with(['options.optionIds','parent','options','options.translations','parent.translation', 'translation'])->findOrFail($request->field_id);
+            $html=view('admin.categoriesformfield.form-line-options',['option'=>$option,'mainForm'=>$mainForm])->render();
             DB::commit();
 
             return response()->json([
@@ -399,6 +400,12 @@ class CategoryFormFieldController extends Controller
                 'parent_option_id' => $request->has('parent_option_id') ? $request->parent_option_id : $option->parent_option_id,
             ]);
 
+            if($request->has('parent_option_id') && !empty($request->parent_option_id)){
+                $idsss = explode(',',$request->parent_option_id);
+                $option->optionIds()->sync($idsss);
+                // dd($option->optionIds);
+            }
+
             /**
              * STEP 2: Update translations
              */
@@ -438,11 +445,15 @@ class CategoryFormFieldController extends Controller
                 }
             }
 
+            $mainForm =  CategoryFormField::with(['parent','options','options.translations','parent.translation', 'translation'])->findOrFail($request->field_id);
+            $html=view('admin.categoriesformfield.form-line-options',['option'=>$option,'mainForm'=>$mainForm])->render();
+
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Option updated successfully.'
+                'message' => 'Option updated successfully.',
+                'html' =>$html
             ]);
 
         } catch (\Throwable $th) {
@@ -452,7 +463,8 @@ class CategoryFormFieldController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
+                'html' =>''
             ]);
         }
     }

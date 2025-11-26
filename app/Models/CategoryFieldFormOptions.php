@@ -9,7 +9,7 @@ class CategoryFieldFormOptions extends Model
 {
     use HasFactory;
     protected $table='category_form_fields_options';
-    protected $fillable = ['field_id','value','parent_option_id','order'];
+    protected $fillable = ['field_id','value','order'];
 
     // create hasmany relationship with FormfieldOptionTranslation
     public function translations()
@@ -22,6 +22,16 @@ class CategoryFieldFormOptions extends Model
     {
         return $this->hasOne(CategoryFieldFormOptionsTranslation::class, 'option_id')
         ->where('lang_code', app()->getLocale());
+    }
+
+    /**
+     * The roles that belong to the CategoryFieldFormOptions
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function optionIds()
+    {
+        return $this->belongsToMany(Self::class, 'category_form_fields_options_relation', 'option_id', 'parent_option_id');
     }
 
 }
