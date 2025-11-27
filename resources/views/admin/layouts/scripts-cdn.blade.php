@@ -37,9 +37,12 @@
 <script src="{{ loadAssets('plugins/datetimepicker/js/picker.time.js') }}"></script>
 <script src="{{ loadAssets('plugins/datetimepicker/js/picker.date.js') }}"></script>
 <script src="{{ loadAssets('plugins/bootstrap-material-datetimepicker/js/moment.min.js') }}"></script>
-<script src="{{ loadAssets('plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js') }}">
+<script
+    src="{{ loadAssets('plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js') }}">
 </script>
 <script src="{{ loadAssets('js/form-date-time-pickes.js') }}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 {{-- <script src="{{ loadAssets('plugins/select2/js/select2.min.js') }}"></script> --}}
 {{-- <script src="{{ loadAssets('js/form-select2.js') }}"></script> --}}
@@ -60,7 +63,7 @@
 <script>
     let extraSearchItem = '';
 
-    function ajaxTableData(sortBy='',direction='') {
+    function ajaxTableData(sortBy = '', direction = '') {
         let perPage = $('#filter-per-page').val();
         let page = $('#filter-page').val();
         let search = $('#filter-search-data').val();
@@ -73,12 +76,11 @@
             'method': 'ajax'
         };
 
-        if(sortBy == ''){
-        }else{
+        if (sortBy == '') {} else {
             dataF.sort = sortBy;
             dataF.direction = direction;
         }
-        
+
         $.ajax({
             url: url + '?' + extraSearchItem,
             data: dataF,
@@ -91,7 +93,7 @@
             },
             success: function(result) {
                 $('.load-table-data').html(result.html);
-                
+
                 // Now initialize facebox on the newly loaded content
                 $('a[rel*=facebox]').facebox();
             }
@@ -115,8 +117,8 @@
         }
     }
 
-    $(document).ready(function(){
-        $('.metismenu a').click(function(){
+    $(document).ready(function() {
+        $('.metismenu a').click(function() {
             $(this).parent().toggleClass('mm-active')
             $(this).siblings().slideToggle();
         });
@@ -124,30 +126,53 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 
-    $(function () {
+    $(function() {
         $('[data-toggle="tooltip"]').tooltip()
     })
 
-    $(document).on('click','#global_delete',function(){
+    $(document).on('click', '#global_delete', function() {
         let message = $(this).attr('data-message');
         let route = $(this).attr('data-route');
         let id = $(this).attr('data-id');
-        
+
         $('#delete-confirm-popup').find('#message').html(message);
         $('#delete-confirm-popup').find('#id').val(id);
         $('#delete-confirm-popup').find('#route').val(route);
         $('#delete-confirm-popup').show();
     });
+
+    function showFlashMessage(type, message) {
+        let alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <strong>${type.toUpperCase()}!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+
+        $("#flashMessageContainer").html(alertHtml);
+
+        // Auto close after 3 seconds
+        setTimeout(function() {
+            $(".alert").alert("close");
+        }, 3000);
+    }
 </script>
 
 <script type="text/javascript">
     var baseUrl = "{{ loadAssets('facebox') }}";
 
     jQuery(document).ready(function($) {
-      $('a[rel*=facebox]').facebox({
-        loadingImage : baseUrl+'/loading.gif',
-        closeImage   : baseUrl+'/closelabel.png'
-      })
+        $('a[rel*=facebox]').facebox({
+            loadingImage: baseUrl + '/loading.gif',
+            closeImage: baseUrl + '/closelabel.png'
+        })
     })
 </script>
 
+<script>
+    $(document).ready(function() {
+        $('.form-select').select2({
+            width: '100%'
+        });
+    });
+</script>
