@@ -485,6 +485,35 @@ class CategoryFormFieldController extends Controller
     }
 
 
+    public function optionfilter(Request $request)
+    {
+        $mainForm = CategoryFormField::find($request->form_id); // <--- Add this line
+
+    $query = CategoryFieldFormOptions::with(['children', 'translation', 'parents']);
+
+    if ($request->parent_option_id) {
+        $query->whereHas('parents', function ($q) use ($request) {
+            $q->where('parent_option_id', $request->parent_option_id);
+        });
+    }
+
+
+    $records = $query->paginate(50);
+
+    $html = '';
+    foreach ($records as $option) {
+        $html .= view('admin.categoriesformfield.form-line-options', compact('option', 'mainForm'))->render();
+    }
+
+    return response()->json([
+        'html' => $html,
+    ]);
+
+    }
+
+
+
+
 
 }
      

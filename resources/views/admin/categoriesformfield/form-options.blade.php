@@ -48,6 +48,16 @@
                                         <b> >>> Parent Question:</b> {{ $mainForm->parent->translation->label }}
                                     </p>
                                 @endif
+                                <div class="col-md-2">
+                                    <select id="ParentOptionFilter" name="parent_option_id" class="form-select">
+                                        <option value="">-- Filter by --</option>
+                                        @foreach ($parentOptions as $parentOption)
+                                            <option value="{{ $parentOption->id }}">
+                                                {{ $parentOption->translation->label ?? 'N/A' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <button id="addRowBtn" type="button" class="btn btn-primary mb-2">Add Option</button>
                             </div>
 
@@ -70,7 +80,7 @@
                                     </tr>
                                 </thead>
 
-                                <tbody>
+                                <tbody id="optionTable">
                                     <!-- Existing rows loaded from DB -->
                                     @foreach ($mainForm->options as $option)
                                         @include('admin.categoriesformfield.form-line-options', [
@@ -322,5 +332,56 @@
                 width: '100%'
             });
         }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+            // Base URL for Facebox assets
+            // var baseUrl = "{{ asset('public/admin/facebox') }}";
+
+            // Initialize Facebox
+            // function initializeFacebox() {
+            //     $('a[rel*=facebox]').facebox({
+            //         loadingImage: baseUrl + '/loading.gif',
+            //         closeImage: baseUrl + '/closelabel.png'
+            //     });
+            // }
+
+            // initializeFacebox();
+            // $(document).on('ajaxComplete', initializeFacebox);
+
+            // AJAX filter
+            $('#ParentOptionFilter').on('change', function() {
+                filterTable();
+            });
+
+            function filterTable(page = 1) {
+            let parent_option_id = $('#ParentOptionFilter').val();
+            let search = $('#search-input').val();
+            let form_id = "{{ $mainForm->id }}"; // send current form id
+
+            $.ajax({
+                url: "{{ route('admin.parentoptions.filter') }}",
+                type: "GET",
+                data: {
+                    parent_option_id,
+                    search,
+                    page,
+                    form_id
+                },
+                success: function (response) {
+                    $("#optionTable").html(response.html);
+                    initselect2();
+                }
+            });
+        }
+
+
+        });
     </script>
 @endpush
