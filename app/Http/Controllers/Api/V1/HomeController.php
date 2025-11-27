@@ -16,6 +16,7 @@ use App\Http\Resources\Api\V1\InsuranceClaimFAQResource;
 use App\Models\Contact;
 use App\Models\Insurance;
 use App\Models\InsuranceClaim;
+use App\Service\API\HomeService;
 
 class HomeController extends Controller
 {
@@ -175,23 +176,31 @@ class HomeController extends Controller
     }
 
 
-    //Fetch Category Form Field by Slug
-    public function categoryfield($slug)
+    // get category form fields by slug with pagination.
+    public function categoryDynamicFormFields(Request $request, $slug)
     {
-        $category = Category::where('slug', $slug)
-            ->where('is_active', 1)
-            ->firstOrFail();
+        try {
 
-        $formFields = Categoryformfield::with('translation')
-            ->where('category_id', $category->id)
-            ->orderBy('sort_order', 'asc')
-            ->get();
+            // get category by slug
+            $category = Category::where('slug', $slug)->where('is_active', 1)->firstOrFail();
 
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Form Fields fetched successfully.',
-            'data'    => CategoryFieldResource::collection($formFields),
-        ]);
+            // get first form fields
+            $question = HomeService::getFirstQuestionOfCategory($request, $category);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Form Fields fetched successfully.',
+                'data'    => [
+                    'category'  => new CategoryResource($category),
+                    'question'  => $question,
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
     }
 
     //Fetch The Contact Form and Saved
