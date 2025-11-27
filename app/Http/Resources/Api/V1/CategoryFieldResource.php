@@ -10,21 +10,14 @@ class CategoryFieldResource extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'category_id'   => $this->category_id,
-            'name'          => $this->name,
-            'type'          => $this->type,
-            'is_required'   => $this->is_required,
-            'sort_order'    => $this->sort_order,
-            'label'         => $this->translation->label ?? $this->label,
-            'place_holder'  => $this->translation->place_holder ?? $this->place_holder,
-
-            // FIXED: options now always array
-            'options'       => $this->translation->options ?? $this->options ?? [],
-
-            // FIXED: images already array due to casts
-            'images' => collect($this->images ?? [])
-                ->map(fn($img) => asset('public/'.$img))
-                ->toArray(),
+            'htmlName'      => $this->name,
+            'htmlType'          => $this->type,
+            'htmlIsRequired'   => $this->is_required,
+            'htmlSortOrder'    => $this->sort_order,
+            'htmlLabel'         => $this->translation->label ?? $this->label,
+            'htmlPlaceHolder'  => $this->translation->place_holder ?? $this->place_holder,
+            // 'Options'       => $this->translation->options ?? $this->options ?? [],
+            'htmlOptions'       => CategoryFieldOptionResource::collection($this->translation->options ?? $this->options ?? []),
         ];
     }
 }

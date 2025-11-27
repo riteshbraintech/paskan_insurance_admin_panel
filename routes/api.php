@@ -29,7 +29,7 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     // public routes here
     Route::get('home', [HomeController::class, 'home']);
     Route::get('header-menu', [HomeController::class, 'headerMenu']);
-    Route::get('category/fields/{slug}',[HomeController::class,'categoryfield']);
+    Route::get('category/form/{slug}',[HomeController::class,'categoryDynamicFormFields']);
     Route::post('contact',[HomeController::class,'contactform']);
 
 
