@@ -12,6 +12,7 @@ use App\Models\Categoryformfield;
 use App\Models\CMSPage;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
 use App\Models\Contact;
+use App\Service\API\HomeService;
 
 class HomeController extends Controller
 {
@@ -152,38 +153,31 @@ class HomeController extends Controller
 
     }
 
-
-    //get Category Form Fields By slug
-    // public function categoryfield($slug){
-    //     $category = Category::where('slug', $slug)->where('is_active', 1)->first();
-    //     $formFields = Categoryformfield::with('translation')->where('category_id', $category->id)->orderBy('sort_order', 'asc')->get();
-        
-    //     return response()->json(
-    //         [
-    //             'status' => 'success',
-    //             'message' => 'Form Fields fetched successfully.',
-    //             'data' => $formFields ?? null,
-    //         ],
-    //         200
-    //     );
-    // }
-
-    public function categoryfield($slug)
+    // get category form fields by slug with pagination.
+    public function categoryDynamicFormFields(Request $request, $slug)
     {
-        $category = Category::where('slug', $slug)
-            ->where('is_active', 1)
-            ->firstOrFail();
+        try {
 
-        $formFields = Categoryformfield::with('translation')
-            ->where('category_id', $category->id)
-            ->orderBy('sort_order', 'asc')
-            ->get();
+            // get category by slug
+            $category = Category::where('slug', $slug)->where('is_active', 1)->firstOrFail();
 
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Form Fields fetched successfully.',
-            'data'    => CategoryFieldResource::collection($formFields),
-        ]);
+            // get first form fields
+            $question = HomeService::getFirstQuestionOfCategory($request, $category);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Form Fields fetched successfully.',
+                'data'    => [
+                    'category'  => new CategoryResource($category),
+                    'question'  => $question,
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
     }
 
     public function contactform(Request $request)
