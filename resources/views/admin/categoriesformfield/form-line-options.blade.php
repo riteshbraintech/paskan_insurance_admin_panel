@@ -10,8 +10,11 @@
         $parentOptions = $mainForm->parent->options ?? [];
 
         $optionIdsss = isset($option->optionIds) ? $option->optionIds()->pluck('id')->toArray() : [];
+        $optionParentIds = $option->parents()->pluck('category_form_fields_options_relation.parent_option_id')->toArray();
 
     @endphp
+   
+
 
     @foreach (langueses() as $langCode => $language)
         <td>
