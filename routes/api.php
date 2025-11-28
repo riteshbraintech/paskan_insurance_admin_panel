@@ -53,7 +53,8 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     // get CMS page list and detail
     Route::get('pages/{slug}', [HomeController::class, 'getCMSPage']);
     
-
+    // get CMS page list and detail
+    Route::get('insuranceclaimfaqs/{slug}', [HomeController::class, 'getinsuranceclaimfaqs']);
     
     // Route::get('/cms-page',[CMSPageControler::class,'index']);
     // Route::get('/cms-page/{slug}',[CMSPageControler::class,'cmspagedetail']);

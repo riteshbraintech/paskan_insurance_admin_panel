@@ -98,7 +98,7 @@ class ArticleController extends Controller
             }
 
             // Create main category
-            $bannerInfo = Article::create([
+            $articleInfo = Article::create([
                 'title' => $englishTitle,
                 'is_active' => $request->is_active ?? 1,
                 'image' => $imageName,
@@ -106,11 +106,14 @@ class ArticleController extends Controller
 
             // save translations
             foreach ($request->trans as $langCode => $trans) {
-                $bannerInfo->translations()->create([
+                $articleInfo->translations()->create([
                     'lang_code' => $langCode,
                     'title' => $trans['title'],
                     'subtitle' =>$trans['subtitle'],
                     'content' => strip_tags($trans['content']),
+                    'meta_title' => $trans['meta_title'],
+                    'meta_description' => $trans['meta_description'],
+                    'meta_keywords' => $trans['meta_keywords'],
                 ]);
             }
 
@@ -149,6 +152,9 @@ class ArticleController extends Controller
                 'title' => $item->title,
                 'subtitle' => $item->subtitle,
                 'content' => $item->content,
+                'meta_title' => $item->meta_title,
+                'meta_keywords' => $item->meta_keywords,
+                'meta_description' => $item->meta_description,
                 ]];
         });
         // dd($translations);
@@ -157,16 +163,23 @@ class ArticleController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request);
         $validatedData = $request->validate([
             // --- English ---
             'trans.en.title' => 'required|string|max:255',
             'trans.en.subtitle' => 'required|string|max:255',
             'trans.en.content' => 'required|string',
+            'trans.en.meta_title' => 'required|string',
+            'trans.en.meta_description' => 'required|string',
+            'trans.en.meta_keywords' => 'required|string',
 
             // --- Thai ---
             'trans.th.title' => 'required|string|max:255',
             'trans.th.subtitle' => 'required|string|max:255',
             'trans.th.content' => 'required|string',
+            'trans.th.meta_title' => 'required|string',
+            'trans.th.meta_description' => 'required|string',
+            'trans.th.meta_keywords' => 'required|string',
             // Optional field
             'is_active' => 'nullable|boolean',
         ], [
@@ -221,6 +234,9 @@ class ArticleController extends Controller
                         'title' => $translationData['title'],
                         'subtitle' => $translationData['subtitle'],
                         'content' => strip_tags( $translationData['content'] ?? ''),
+                        'meta_title' => $translationData['meta_title'] ?? '',
+                        'meta_description' => $translationData['meta_description'] ?? '',
+                        'meta_keywords' => $translationData['meta_keywords'] ?? '',
                     ]
                 );
             }
@@ -269,6 +285,9 @@ class ArticleController extends Controller
                 'title' => $item->title,
                 'subtitle' => $item->subtitle,
                 'content' => $item->content,
+                'meta_title' => $item->meta_title,
+                'meta_keywords' => $item->meta_keywords,
+                'meta_description' => $item->meta_description,
                 ]];
         });
         return view('admin.article.view', compact('record', 'translations'));

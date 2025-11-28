@@ -197,7 +197,7 @@
                 <a href="javascript:void(0);"
                     class="has-arrow {{ in_array($segment, ['insurance', 'claiminsurance']) ? 'mm-active' : '' }}">
                     <i class="fa-solid fa-shield-halved"></i>
-                    <div class="menu-title">Manage Insurance</div>
+                    <div class="menu-title">Manage Insurance FAQs</div>
                 </a>
                 <ul
                     class="mm-collapse new-submenu {{ in_array($segment, ['insurance', 'claiminsurance']) ? 'mm-show' : '' }}">

@@ -19,6 +19,7 @@ class CreateCategoryFieldFormTranslationsTable extends Migration
             $table->string('lang_code');
             $table->string('label')->nullable();
             $table->string('place_holder')->nullable(); 
+            $table->string('short_description')->nullable();
             // $table->json('options')->nullable(); 
             $table->timestamps();
             $table->foreign('categoryformfield_id')->references('id')->on('categoryformfields')->onDelete('cascade');

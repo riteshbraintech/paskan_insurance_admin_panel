@@ -10,11 +10,7 @@ class ArticleTranslation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'banner_id',
-        'lang_code',
-        'title',
-        'subtitle',
-        'content',
+        'banner_id','lang_code','title','subtitle','content','meta_title', 'meta_description', 'meta_keywords'
     ];
 
     public function page()

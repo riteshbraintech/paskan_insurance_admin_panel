@@ -11,7 +11,11 @@ use App\Models\Banner;
 use App\Models\Categoryformfield;
 use App\Models\CMSPage;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
+use App\Http\Resources\Api\V1\HelpmenuResource;
+use App\Http\Resources\Api\V1\InsuranceClaimFAQResource;
 use App\Models\Contact;
+use App\Models\Insurance;
+use App\Models\InsuranceClaim;
 use App\Service\API\HomeService;
 
 class HomeController extends Controller
@@ -42,7 +46,8 @@ class HomeController extends Controller
          // Fetch banners as needed
         $testimonials = []; // Fetch testimonials as needed
         $insurances = []; // Fetch insurances as needed
-
+        $helpmenu= Insurance::with('translation')->where('is_published',1)->get(); //Fetch insurances for faqs
+        // dd($helpmenu);
         
         $payload = [
             'banners' => BannerResource::collection($banners),
@@ -50,6 +55,7 @@ class HomeController extends Controller
             'categories' => CategoryResource::collection($randomCategories),
             'testimonials' => $testimonials,
             'insurances' => $insurances,
+            'helpmenu' => HelpmenuResource::collection($helpmenu),
         ];
 
 
@@ -153,6 +159,23 @@ class HomeController extends Controller
 
     }
 
+
+    //get Insurance Claim FAQs By Insurance slug
+    public function getinsuranceclaimfaqs($slug){
+        $insurance = Insurance::where('slug', $slug)->where('is_published', 1)->first();
+        $insuranceclaimfaqs = InsuranceClaim::with('translation')->where('insurance_id', $insurance->id)->where('is_published',1)->orderBy('sort_order', 'asc')->get();
+        
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'Insurance Claim FAQs fetched successfully.',
+                'data' => InsuranceClaimFAQResource::collection($insuranceclaimfaqs),
+            ],
+            200
+        );
+    }
+
+
     // get category form fields by slug with pagination.
     public function categoryDynamicFormFields(Request $request, $slug)
     {
@@ -180,6 +203,7 @@ class HomeController extends Controller
         }
     }
 
+    //Fetch The Contact Form and Saved
     public function contactform(Request $request)
     {
         $request->validate([

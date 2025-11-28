@@ -50,6 +50,18 @@
                             <td>{!! $data['content'] !!}</td>
                         </tr>
                         <tr>
+                            <th>Meta Title</th>
+                            <td>{{ $data['meta_title'] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Meta Description</th>
+                            <td>{{ $data['meta_description'] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Meta Keywords</th>
+                            <td>{{ $data['meta_keywords'] }}</td>
+                        </tr>
+                        <tr>
                             <th>Image</th>
                             <td>
                                 @if (!empty($record['image']))

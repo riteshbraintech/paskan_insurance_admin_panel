@@ -64,6 +64,30 @@
                                 </div>
                             @endforeach
 
+                            @foreach (langueses() as $langCode => $language)
+                                <div class="col-md-4">
+                                    <label for="meta_title" class="form-label">{{ __('Meta Title')}} ({{$language}})</label>
+                                    <input type="text" name="trans[{{$langCode}}][meta_title]]" class="form-control" id="meta_title" value="{{ old('trans.'.$langCode.'.meta_title') }}" placeholder=" {{ __('Enter meta title in') .' '. $language }}">
+                                    @if ($errors->has('trans.'.$langCode.'.meta_title'))
+                                        <div class="text-danger">{{ $errors->first('trans.'.$langCode.'.meta_title') }}</div>
+                                    @endif
+                                </div>    
+                                <div class="col-md-4">
+                                    <label for="meta_keywords" class="form-label">{{ __('Meta keywords')}} ({{$language}})</label>
+                                    <input type="text" name="trans[{{$langCode}}][meta_keywords]]" class="form-control" id="meta_keywords" value="{{ old('trans.'.$langCode.'.meta_keywords') }}" placeholder=" {{ __('Enter meta keywords in') .' '. $language }}">
+                                    @if ($errors->has('trans.'.$langCode.'.meta_keywords'))
+                                        <div class="text-danger">{{ $errors->first('trans.'.$langCode.'.meta_keywords') }}</div>
+                                    @endif
+                                </div>    
+                                <div class="col-md-4">
+                                    <label for="meta_description" class="form-label">{{ __('Meta Description')}} ({{$language}})</label>
+                                    <input type="text" name="trans[{{$langCode}}][meta_description]]" class="form-control" id="meta_description" value="{{ old('trans.'.$langCode.'.meta_description') }}" placeholder=" {{ __('Enter meta description in') .' '. $language }}">
+                                    @if ($errors->has('trans.'.$langCode.'.meta_description'))
+                                        <div class="text-danger">{{ $errors->first('trans.'.$langCode.'.meta_description') }}</div>
+                                    @endif
+                                </div>                                
+                            @endforeach
+
                             <div class="col-md-12">
                                 <label for="image" class="form-label mt-4">image</label>
                                 <input type="file" name="image" class="form-control" id="image">

@@ -61,6 +61,7 @@ class CategoryController extends Controller
 
             // --- Optional ---
             'is_active' => 'nullable|boolean',
+            'is_link' => 'nullable|boolean',
             // --- Image validation ---
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
@@ -117,6 +118,7 @@ class CategoryController extends Controller
             $categoryInfo = Category::create([
                 'title' => $englishTitle,
                 'slug' => $slug,
+                'is_link' => $request->is_link ?? 0,
                 'is_active' => $request->is_active ?? 1,
                 'image' => $imageName,
             ]);
@@ -316,4 +318,17 @@ class CategoryController extends Controller
         return view('admin.categories.view', compact('record', 'translations'));
     }
 
+    public function changeapilinkStatus($id)
+    {
+        $record = Category::findOrFail($id);
+
+        $record->is_link = $record->is_link == 1 ? 0 : 1;
+        $record->save();
+        $status = $record->is_link == 1 ? 'yes' : 'no';
+        return response()->json([
+            'status' => $status,
+            'success' => true,
+            'message' => "Category Link to Api status changed successfully.",
+        ]);
+    }
 }

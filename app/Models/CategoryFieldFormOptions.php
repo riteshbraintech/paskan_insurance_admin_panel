@@ -34,4 +34,18 @@ class CategoryFieldFormOptions extends Model
         return $this->belongsToMany(Self::class, 'category_form_fields_options_relation', 'option_id', 'parent_option_id');
     }
 
+    public function parents()
+    {
+        return $this->belongsToMany(CategoryFieldFormOptions::class,'category_form_fields_options_relation','option_id','parent_option_id');
+    }
+
+    public function children()
+    {
+        return $this->belongsToMany(CategoryFieldFormOptions::class,'category_form_fields_options_relation','parent_option_id', 'option_id');
+    }
+
+
+
+
+
 }

@@ -35,6 +35,7 @@
                 <th>Field Label</th>
                 <th>HTML Type</th>
                 <th>Av. Options</th>
+                <th class="no-wrap">Filtered</th>
                 <th class="no-wrap">Required</th>
                 <th class="no-wrap" width="100px">Action</th>
             </tr>
@@ -83,6 +84,14 @@
                                 </a>
                             @endif
                         </div>
+                    </td>
+
+                    <td>
+                        <span
+                            class="badge badge-{{ $item->is_filtered ? 'success' : 'danger' }} filterstatus-{{ $item->id }}"
+                            onclick="filterchangeStatus(event, {{ $item->id }})">
+                            {{ $item->is_filtered ? 'Yes' : 'No' }}
+                        </span>
                     </td>
 
                     <td>

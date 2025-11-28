@@ -93,9 +93,26 @@
                                 </div>
                             @endforeach
 
+                            @foreach (langueses() as $langCode => $language)
+                                <div class="col-md-6">
+                                    <label for="short_description_{{ $langCode }}" class="form-label">Short Description
+                                        ({{ $language }})
+                                        <span class="text-danger">*</span></label>
+                                    <input type="text" name="trans[{{ $langCode }}][short_description]"
+                                        class="form-control" id="short_description_{{ $langCode }}"
+                                        value="{{ old('trans.' . $langCode . '.short_description') }}"
+                                        placeholder="Enter short_description in {{ $language }}">
+                                    @if ($errors->has('trans.' . $langCode . '.short_description'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('trans.' . $langCode . '.short_description') }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+
 
                             {{-- Field info --}}
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input type="text" name="name" class="form-control" id="name"
                                     value="{{ old('name') }}" placeholder="Enter unique name">
@@ -108,7 +125,7 @@
                                 $oldTypes = old('type', []);
                             @endphp
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="type" class="form-label">
                                     Field Type <span class="text-danger">*</span>
                                 </label>
@@ -129,7 +146,27 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
+                                <label for="is_filtered" class="form-label">
+                                    Is Filtered ? <span class="text-danger">*</span>
+                                </label>
+                                @php
+                                    $fieldArry = [0=>'No', 1=>'Yes'];
+                                @endphp
+                                <select name="is_filtered" id="is_filtered" class="form-control">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach ($fieldArry  as $key => $fieldname)
+                                        <option value="{{$key}}" {{ old('is_filtered') == $key ? 'selected' : '' }}>
+                                            {{ ucfirst($fieldname)}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('is_filtered')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
                                 <label for="is_required" class="form-label">
                                     Is Required ? <span class="text-danger">*</span>
                                 </label>

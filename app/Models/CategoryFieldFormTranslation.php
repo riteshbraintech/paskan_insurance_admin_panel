@@ -16,6 +16,7 @@ class CategoryFieldFormTranslation extends Model
         'lang_code',
         'label',
         'place_holder',
+        'short_description',
         'options',
     ];
 

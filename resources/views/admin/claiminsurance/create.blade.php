@@ -32,21 +32,9 @@
                                 <select name="insurance_id" id="insurance_id" class="form-control">
                                     <option value="">-- Select Insurance --</option>
                                     @foreach ($insurances as $insurance)
-                                        @php
-                                            // Detect current language (or set default)
-                                            $lang = app()->getLocale() ?? 'en';
-
-                                            $translation = $insurance->translations->where('lang_code', $lang)->first();
-
-                                            if (!$translation) {
-                                                $translation = $insurance->translations->first();
-                                            }
-                                            $insuranceName = $translation->title ?? ($insurance->title ?? 'Unnamed');
-                                        @endphp
-
                                         <option value="{{ $insurance->id }}"
                                             {{ old('insurance_id') == $insurance->id ? 'selected' : '' }}>
-                                            {{ $insuranceName }}
+                                            {{ $insurance->translation->title }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -56,7 +44,6 @@
                             </div>
 
                             {{-- Multilingual fields --}}
-
                             @foreach (langueses() as $langCode => $language)
                                 <div class="col-md-6">
                                     <label for="title_{{ $langCode }}" class="form-label">Title ({{ $language }})
@@ -77,7 +64,8 @@
                                     <textarea name="trans[{{ $langCode }}][description]" id="trans_{{ $langCode }}_description"
                                         class="form-control" cols="30" rows="5">{{ old('trans.' . $langCode . '.description') }}</textarea>
                                     @if ($errors->has('trans.' . $langCode . '.description'))
-                                        <div class="text-danger">{{ $errors->first('trans.' . $langCode . '.description') }}
+                                        <div class="text-danger">
+                                            {{ $errors->first('trans.' . $langCode . '.description') }}
                                         </div>
                                     @endif
                                 </div>
