@@ -42,6 +42,7 @@ class CategoryFormFieldsRequest extends FormRequest
             'type' => 'required|string',
             'parent_field_id' => 'nullable',
             'is_required' => 'nullable',
+            'is_filtered' => 'nullable',
             'trans' => ['required', 'array', 'min:1'],
         ];
 
@@ -52,6 +53,7 @@ class CategoryFormFieldsRequest extends FormRequest
         // Define common translation rules
         $translationRules = [
             'place_holder' => 'nullable|string|max:255',
+            'short_description' => 'nullable|string|max:255',
         ];
 
         // Apply per-language title uniqueness and other fields

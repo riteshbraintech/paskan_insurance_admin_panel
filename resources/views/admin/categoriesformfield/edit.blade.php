@@ -61,6 +61,16 @@
                                 </div>
                             @endforeach
 
+                            {{-- ==================== Short Description (MULTI-LANG) ==================== --}}
+                            @foreach (langueses() as $lang => $language)
+                                <div class="col-md-6">
+                                    <label class="form-label">Short Desription ({{ $language }})</label>
+                                    <input type="text" class="form-control"
+                                        name="trans[{{ $lang }}][short_description]"
+                                        value="{{ old("trans.$lang.short_description", $translations[$lang]['short_description'] ?? '') }}">
+                                </div>
+                            @endforeach
+
 
                             {{-- ==================== FIELD NAME ==================== --}}
                             <div class="col-md-4">

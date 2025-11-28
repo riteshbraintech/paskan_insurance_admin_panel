@@ -80,5 +80,33 @@
                 }
             });
         }
+
+        function change_link_to_api_Status(event, id) {
+            let url = "{{ route('admin.categories.change.linktoapistatus') }}" + "/" + id;
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {
+                    "_token": "{{ csrf_token() }}"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status == "yes") {
+                        $(`.linkapistatus-${id}`).html("Yes");
+                        $(`.linkapistatus-${id}`).addClass("badge-success");
+                        $(`.linkapistatus-${id}`).removeClass("badge-danger");
+                        // show flash message dynamically
+                        showFlashMessage('success', response.message || 'Status changed successfully!');
+                    } else {
+                        $(`.linkapistatus-${id}`).html("No");
+                        $(`.linkapistatus-${id}`).addClass("badge-danger");
+                        $(`.linkapistatus-${id}`).removeClass("badge-success");
+                        // show flash message dynamically
+                        showFlashMessage('success', response.message || 'Status changed successfully!');
+                    }
+                }
+            });
+        }
+        
     </script>
 @endpush

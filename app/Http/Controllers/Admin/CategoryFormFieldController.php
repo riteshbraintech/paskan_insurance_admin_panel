@@ -90,6 +90,7 @@ class CategoryFormFieldController extends Controller
     public function store(CategoryFormFieldsRequest $request)
     {
 
+        // dd($request->all());
         DB::beginTransaction();
         try {
 
@@ -106,6 +107,7 @@ class CategoryFormFieldController extends Controller
                 'name' => $request->name,
                 'type' => $request->type,
                 'parent_field_id' => $request->has('parent_field_id') ? $request->parent_field_id : null,
+                'is_filter' => $request->has('is_filtered'),
                 'is_required' => $request->has('is_required'),
                 'sort_order' => $newSortOrder,
             ]);
@@ -123,6 +125,7 @@ class CategoryFormFieldController extends Controller
                     'lang_code' => $lang,
                     'label' => $data['label'],
                     'place_holder' => $data['place_holder'],
+                    'short_description' => $data['short_description'],
                 ]);
             }
 
@@ -167,7 +170,30 @@ class CategoryFormFieldController extends Controller
         ]);
     }
 
+    public function filterchangeStatus($id)
+    {
+        $record = Categoryformfield::find($id);
 
+        if (!$record) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category Form Field not found.'
+            ]);
+        }
+
+        $record->is_filtered = $record->is_filtered == 1 ? 0 : 1;
+        $record->save();
+
+        $status = $record->is_filtered ? 'Yes' : 'No';
+
+        return response()->json([
+            'success' => true,
+            'status' => $status,
+            'message' => "Category Form Field Filter Status changed to {$status} successfully!"
+        ]);
+    }
+
+    
 
     public function edit($id)
     {
@@ -185,6 +211,7 @@ class CategoryFormFieldController extends Controller
                 'id' => $item->id,
                 'label' => $item->label,
                 'place_holder' => $item->place_holder,
+                'short_description' => $item -> short_description,
                 'options' => $item->options ? json_encode(json_decode($item->options, true), JSON_UNESCAPED_UNICODE) : '',
                 'images' => $item->images ? json_encode(json_decode($item->images, true), JSON_UNESCAPED_UNICODE) : '',
                 ]];
@@ -196,7 +223,7 @@ class CategoryFormFieldController extends Controller
 
     public function update(CategoryFormFieldsRequest $request, $id)
     {
-
+        // dd($request->all());
         DB::beginTransaction();
         try {
 
@@ -218,7 +245,8 @@ class CategoryFormFieldController extends Controller
                     ],
                     [
                         'label' => $translation['label'] ?? null,
-                        'place_holder' => $translation['place_holder'] ?? null
+                        'place_holder' => $translation['place_holder'] ?? null,
+                        'short_description' => $translation['short_description'] ?? null,
                     ]
                 );
             }
@@ -267,6 +295,7 @@ class CategoryFormFieldController extends Controller
                 'id' => $item->id,
                 'label' => $item->label,
                 'place_holder' => $item->place_holder,
+                'short_description' => $item->short_description,
                 'options' => $item->options ? json_encode(json_decode($item->options, true), JSON_UNESCAPED_UNICODE) : '',
                 ]];
         });
@@ -309,11 +338,13 @@ class CategoryFormFieldController extends Controller
         DB::beginTransaction();
 
         try {
+            
             // Compute sort order
             $lastOrder = CategoryFormField::max('sort_order');
             $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
-
             // Create option record
+            $field = CategoryFormField::find($request->field_id);
+            // dd($field,$request->all());
             $option = CategoryFieldFormOptions::create([
                 'field_id' => $request->field_id,
                 'value'    => $request->value,
@@ -372,7 +403,7 @@ class CategoryFormFieldController extends Controller
         } catch (\Throwable $th) {
 
             DB::rollBack();
-            dd($th);
+            // dd($th);
             \Log::alert("Error in Store: " . $th->getMessage());
 
             return response()->json([
@@ -471,43 +502,42 @@ class CategoryFormFieldController extends Controller
 
     public function deleteOption($id)
     {
-        // dd($id);
         $option = CategoryFieldFormOptions::findOrFail($id);
-
         // delete translations first
         CategoryFieldFormOptionsTranslation::where('option_id', $id)->delete();
 
-        
         // delete main option
         $option->delete();
 
         return response()->json(['success' => true, 'message' => 'Option deleted']);
     }
-
+    
 
     public function optionfilter(Request $request)
     {
-        $mainForm = CategoryFormField::find($request->form_id); // <--- Add this line
+        $mainForm = CategoryFormField::find($request->form_id); 
+        $query = CategoryFieldFormOptions::with(['children', 'translation', 'parents']);
 
-    $query = CategoryFieldFormOptions::with(['children', 'translation', 'parents']);
+        if ($request->parent_option_id) {
+            $query->whereHas('parents', function ($q) use ($request) {
+                $q->where('parent_option_id', $request->parent_option_id);
+            });
+        }
+        else {
+            return $query ;
+        }
 
-    if ($request->parent_option_id) {
-        $query->whereHas('parents', function ($q) use ($request) {
-            $q->where('parent_option_id', $request->parent_option_id);
-        });
-    }
 
+        $records = $query->paginate(50);
 
-    $records = $query->paginate(50);
+        $html = '';
+        foreach ($records as $option) {
+            $html .= view('admin.categoriesformfield.form-line-options', compact('option', 'mainForm'))->render();
+        }
 
-    $html = '';
-    foreach ($records as $option) {
-        $html .= view('admin.categoriesformfield.form-line-options', compact('option', 'mainForm'))->render();
-    }
-
-    return response()->json([
-        'html' => $html,
-    ]);
+        return response()->json([
+            'html' => $html,
+        ]);
 
     }
 

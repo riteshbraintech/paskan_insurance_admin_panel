@@ -101,7 +101,42 @@
                     showFlashMessage('error', 'Server error occurred.');
                 }
             });
-        }        
+        }     
+
+        function filterchangeStatus(event, id) {
+            let url = "{{ route('admin.categoryformfield.filterchange.status') }}" + "/" + id;
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {
+                    "_token": "{{ csrf_token() }}"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.success) {
+                        // update badge
+                        if (response.status === "Yes") {
+                            $(`.filterstatus-${id}`).html("Yes")
+                                .addClass("badge-success")
+                                .removeClass("badge-danger");
+                        } else {
+                            $(`.filterstatus-${id}`).html("No")
+                                .addClass("badge-danger")
+                                .removeClass("badge-success");
+                        }
+
+                        // show flash message dynamically
+                        showFlashMessage('success', response.message || 'Status changed successfully!');
+                    } else {
+                        showFlashMessage('error', response.message || 'Something went wrong.');
+                    }
+                },
+                error: function() {
+                    showFlashMessage('error', 'Server error occurred.');
+                }
+            });
+        }
+           
     </script>
 
     <script>

@@ -17,7 +17,7 @@ class CreateCategoryFormFieldsOptionsTable extends Migration
             $table->id();
             $table->foreignId('field_id')->constrained('categoryformfields')->cascadeOnDelete();
             $table->string('value');
-            $table->foreignId('parent_option_id')->nullable()->constrained('category_form_fields_options')->nullOnDelete();
+            // $table->foreignId('parent_option_id')->nullable()->constrained('category_form_fields_options')->nullOnDelete();
             $table->integer('order')->default(0);
             $table->timestamps();
         });

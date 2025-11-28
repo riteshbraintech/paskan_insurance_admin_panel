@@ -54,14 +54,16 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Image</th>
+                    <th>Form Is Filtered</th>
                     <td>
-                        @foreach ($record->image_urls as $img)
-                            <img src="{{ $img }}" width="80">
-                        @endforeach
-
+                        @if ($record->is_filtered)
+                            <span class="badge bg-success">Yes</span>
+                        @else
+                            <span class="badge bg-danger">No</span>
+                        @endif
                     </td>
                 </tr>
+                
             </table>
         </div>
     </div>
@@ -88,13 +90,18 @@
                             <td>{{ $data['place_holder'] }}</td>
                         </tr>
 
+                        <tr>
+                            <th width="25%">Short Description</th>
+                            <td>{{ $data['short_description'] }}</td>
+                        </tr>
+
                         {{-- ✅ Hide options if field type is "number", "text", or "textarea" --}}
-                        @unless (in_array($record->type, ['number', 'text', 'textarea']))
+                        {{-- @unless (in_array($record->type, ['number', 'text', 'textarea']))
                             <tr>
                                 <th>Options</th>
                                 <td>{!! $data['options'] ?? '-' !!}</td>
                             </tr>
-                        @endunless
+                        @endunless --}}
                     </table>
                 </div>
             @empty

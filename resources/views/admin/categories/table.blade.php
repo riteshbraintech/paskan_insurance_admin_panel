@@ -10,6 +10,7 @@
                 @foreach (langueses() as $langCode => $language)
                     <th class="no-wrap">Title ({{ $language }}) </th>
                 @endforeach
+                <th class="no-wrap">Link To Api</th>
                 <th class="no-wrap"> @sortablelink('is_active', 'Status')</th>
                 <th class="no-wrap text-center" width="100px">Action</th>
             </tr>
@@ -28,6 +29,13 @@
                     @foreach (langueses() as $langCode => $language)
                         <td>{{ $item->translations->where('lang_code', $langCode)->first()->title ?? 'N/A' }}</td>
                     @endforeach
+
+                    <td>
+                        <span
+                            class="badge badge-{{ $item->is_link == 1 ? 'success' : 'danger' }} linkapistatus-{{ $item->id }}"
+                            onclick="change_link_to_api_Status(event,{{ $item->id }})">{{ ucfirst($item->is_link == 1 ? 'Yes' : 'No') }}
+                        </span>
+                    </td>
 
                     <td>
                         <span

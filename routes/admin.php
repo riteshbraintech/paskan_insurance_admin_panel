@@ -170,6 +170,7 @@ Route::prefix('/admin')->group(function () {
             Route::post('update/{id?}', [CategoryController::class, 'update'])->name('admin.categories.update');
             Route::get('delete/{id?}', [CategoryController::class, 'delete'])->name('admin.categories.delete');
             Route::get('view/{id?}', [CategoryController::class, 'view'])->name('admin.categories.view');
+            Route::post('apilinkstatus/{id?}', [CategoryController::class, 'changeapilinkStatus'])->name('admin.categories.change.linktoapistatus');
         });
 
         // Category form field route
@@ -190,6 +191,7 @@ Route::prefix('/admin')->group(function () {
             Route::delete('optiondelete/{id}', [CategoryFormFieldController::class, 'deleteOption'])->name('admin.categoryformfieldoptions.optiondelete');
             Route::post('optionupdate/{id}', [CategoryFormFieldController::class, 'optionupdate'])->name('admin.categoryformfieldoptions.optionupdate');
             Route::get('optionfilter', [CategoryFormFieldController::class, 'optionfilter'])->name('admin.parentoptions.filter');
+            Route::post('filterchangestatus/{id?}', [CategoryFormFieldController::class, 'filterchangeStatus'])->name('admin.categoryformfield.filterchange.status');
 
 
         });

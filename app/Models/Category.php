@@ -11,7 +11,7 @@ class Category extends Model
 {
     use HasFactory, Sortable;
 
-    protected $fillable = ['title', 'slug', 'is_active', 'image'];
+    protected $fillable = ['title', 'slug', 'is_active','is_link', 'image'];
     public $sortable = ['id', 'title', 'is_active'];
 
     // create a is active scope to filter active categories
