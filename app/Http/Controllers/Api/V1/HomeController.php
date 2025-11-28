@@ -27,7 +27,7 @@ class HomeController extends Controller
 
         // You may tweak queries: eager load, caching, per-page limits, etc.
         // 1️⃣ Get top 4 categories
-        $topcategories = Category::with('translation')
+        $topcategories = Category::with('translation')->where('is_link', 1)
             ->active()
             ->orderBy('created_at', 'asc') // or by any other priority column
             ->limit(4)

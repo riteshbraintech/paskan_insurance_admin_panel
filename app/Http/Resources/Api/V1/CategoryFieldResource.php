@@ -16,6 +16,7 @@ class CategoryFieldResource extends JsonResource
             'htmlSortOrder'    => $this->sort_order,
             'htmlLabel'         => $this->translation->label ?? $this->label,
             'htmlPlaceHolder'  => $this->translation->place_holder ?? $this->place_holder,
+            'htmlShortDescription'  => $this->translation->short_description ?? '',
             // 'Options'       => $this->translation->options ?? $this->options ?? [],
             'htmlOptions'       => CategoryFieldOptionResource::collection($this->translation->options ?? $this->options ?? []),
         ];
