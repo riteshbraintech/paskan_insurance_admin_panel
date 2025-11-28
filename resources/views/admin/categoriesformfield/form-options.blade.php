@@ -162,7 +162,7 @@
             $("#addRowBtn").click(function() {
                 let template = document.getElementById("newRowTemplate");
                 let clone = template.content.cloneNode(true);
-                $("#optionsTable tbody").append(clone);
+                $("#optionsTable tbody").prepend(clone);
                 initselect2();
             });
 
@@ -341,21 +341,7 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
-            // Base URL for Facebox assets
-            // var baseUrl = "{{ asset('public/admin/facebox') }}";
-
-            // Initialize Facebox
-            // function initializeFacebox() {
-            //     $('a[rel*=facebox]').facebox({
-            //         loadingImage: baseUrl + '/loading.gif',
-            //         closeImage: baseUrl + '/closelabel.png'
-            //     });
-            // }
-
-            // initializeFacebox();
-            // $(document).on('ajaxComplete', initializeFacebox);
-
-            // AJAX filter
+  
             $('#ParentOptionFilter').on('change', function() {
                 filterTable();
             });

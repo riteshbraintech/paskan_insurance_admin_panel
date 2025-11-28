@@ -42,7 +42,6 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     //get Banner Data
     Route::get('banner',[HomeController::class,'banner']);
 
-    
     //get form field image with option
     Route::get('optionimage/{id}',[HomeController::class,'show']);
     
@@ -53,7 +52,7 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
     // get CMS page list and detail
     Route::get('pages/{slug}', [HomeController::class, 'getCMSPage']);
     
-    // get CMS page list and detail
+    // get Insurance page list and detail
     Route::get('insuranceclaimfaqs/{slug}', [HomeController::class, 'getinsuranceclaimfaqs']);
     
     // Route::get('/cms-page',[CMSPageControler::class,'index']);

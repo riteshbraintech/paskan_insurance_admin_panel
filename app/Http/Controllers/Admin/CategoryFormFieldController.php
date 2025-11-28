@@ -16,6 +16,8 @@ use App\Models\Option;
 use App\Models\OptionTranslation;
 use App\Http\Requests\Admin\CategoryFormFieldOptionsRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+
 
 class CategoryFormFieldController extends Controller
 {
@@ -421,7 +423,6 @@ class CategoryFormFieldController extends Controller
         DB::beginTransaction();
 
         try {
-
             // Find existing option
             $option = CategoryFieldFormOptions::findOrFail($id);
 
@@ -500,17 +501,53 @@ class CategoryFormFieldController extends Controller
         }
     }
 
+    // public function deleteOption($id)
+    // {
+    //     $option = CategoryFieldFormOptions::findOrFail($id);
+
+     
+    //     // Delete translations first
+    //     CategoryFieldFormOptionsTranslation::where('option_id', $id)->delete();
+
+    //     // Delete main option
+    //     $option->delete();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Option deleted'
+    //     ]);
+    // }
+
     public function deleteOption($id)
     {
         $option = CategoryFieldFormOptions::findOrFail($id);
-        // delete translations first
+
+        // Delete images from translations
+        $translations = CategoryFieldFormOptionsTranslation::where('option_id', $id)->get();
+
+        foreach ($translations as $translation) {
+            if (!empty($translation->image)) {
+                $imagePath = public_path('admin/form_options/' . $translation->image);
+                if (File::exists($imagePath)) {
+                    File::delete($imagePath);
+                }
+            }
+        }
+
+        // Delete translations
         CategoryFieldFormOptionsTranslation::where('option_id', $id)->delete();
 
-        // delete main option
+        // Delete main option
         $option->delete();
 
-        return response()->json(['success' => true, 'message' => 'Option deleted']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Option deleted'
+        ]);
     }
+
+
+
     
 
     public function optionfilter(Request $request)
@@ -518,15 +555,16 @@ class CategoryFormFieldController extends Controller
         $mainForm = CategoryFormField::find($request->form_id); 
         $query = CategoryFieldFormOptions::with(['children', 'translation', 'parents']);
 
+        // If a specific parent_option_id is passed → filter by that parent
         if ($request->parent_option_id) {
             $query->whereHas('parents', function ($q) use ($request) {
                 $q->where('parent_option_id', $request->parent_option_id);
             });
-        }
+        } 
+        // If no parent_option_id → show ONLY child options
         else {
-            return $query ;
+            $query->whereHas('parents');
         }
-
 
         $records = $query->paginate(50);
 
@@ -540,6 +578,7 @@ class CategoryFormFieldController extends Controller
         ]);
 
     }
+    
 
 
 
