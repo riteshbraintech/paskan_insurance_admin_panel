@@ -130,7 +130,7 @@
                                     Field Type <span class="text-danger">*</span>
                                 </label>
                                 @php
-                                    $fieldArry = ['text', 'number', 'select','checkbox','radio','textarea'];
+                                    $fieldArry = ['text', 'number', 'select','checkbox','radio','textarea','date'];
                                 @endphp
                                 <select name="type" id="type" class="form-select">
                                     <option value="">-- Select Type --</option>
