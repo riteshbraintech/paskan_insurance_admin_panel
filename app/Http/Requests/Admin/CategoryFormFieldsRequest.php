@@ -37,7 +37,7 @@ class CategoryFormFieldsRequest extends FormRequest
                 'required',
                 'string',
                 'max:255', 
-                Rule::unique(Categoryformfield::class, 'name')->ignore($pageId)
+                // Rule::unique(Categoryformfield::class, 'name')->ignore($pageId)
             ],
             'type' => 'required|string',
             'parent_field_id' => 'nullable',

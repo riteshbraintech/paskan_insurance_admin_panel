@@ -63,13 +63,14 @@ class CategoryFormFieldController extends Controller
         $perPage = $request->perPage ?? 50;
         $isAjax = $request->ajax();
 
-        // Get Car Insurance category first for default
-        $defaultCategory = Category::whereHas('translation', function ($q) {
-            $q->where('title', 'Car Insurance');
-        })->first();
+        // Get all categories
+        $categories = Category::with('translation')->get();
 
-        // Use existing selected category OR default category
-        $categoryID = $request->category_id ?? ($defaultCategory->id ?? 0);
+        // Choose first category as default
+        $defaultCategoryID = $categories->first()->id ?? null;
+
+        // Use request category_id or default
+        $categoryID = $request->category_id ?? $defaultCategoryID;
 
         // Records Query
         $records = Categoryformfield::with(['translations', 'translation'])
@@ -84,9 +85,6 @@ class CategoryFormFieldController extends Controller
             ->sortable(['sort_order' => 'asc'])
             ->paginate($perPage);
 
-        // Get categories list
-        $categories = Category::with('translation')->get();
-
         // For AJAX Requests
         if ($isAjax) {
             $html = view('admin.categoriesformfield.table', compact('records'))->render();
@@ -95,6 +93,7 @@ class CategoryFormFieldController extends Controller
 
         return view('admin.categoriesformfield.index', compact('records', 'categories', 'categoryID'));
     }
+
 
 
     public function filter(Request $request)
