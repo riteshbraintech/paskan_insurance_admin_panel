@@ -73,6 +73,11 @@ Route::prefix('v1')->middleware(['api'])->group(function () {
         Route::post('/updateprofile',[ProfileControler::class,'updateProfile']);
     });
 
+
+    // category-submit-enquiry
+    Route::get('category/all-form/{slug}',[HomeController::class,'categoryAllDynamicFormFields']);
+    Route::post('category-submit-enquiry',[HomeController::class,'categorySubmitEnquiry']);
+
 });
 
 

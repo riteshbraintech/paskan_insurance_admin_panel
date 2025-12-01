@@ -93,4 +93,12 @@ class HomeController extends Controller
     {
         //
     }
+
+    // categorySubmitEnquiry 
+    public function categorySubmitEnquiry(Request $request)
+    {
+        dd($request->all());
+    }
+
+
 }

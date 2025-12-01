@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class UserEnquery extends Model
 {
     use HasFactory;
-    protected $fillable=['user_id','category_id','enqury_time'];
+    protected $table = 'user_insurance_enqueries';
+    protected $fillable=['user_id','category_id','enquery_time', 'status'];
 }

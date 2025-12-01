@@ -13,19 +13,19 @@ class CreateUserInsuranceFillupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_insurance_fillups', function (Blueprint $table) {
+        Schema::create('user_insurance_enqueries_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('uie_id'); 
             $table->unsignedBigInteger('user_id'); 
             $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('formfieldname'); 
-            $table->string('formfieldvalue');
+            $table->unsignedBigInteger('form_field_id'); 
+            $table->unsignedBigInteger('form_field_name'); 
+            $table->string('form_field_value');
 
             $table->timestamps();
 
             // Foreign Key
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('formfieldname')->references('id')->on('categoryformfields')->onDelete('cascade');
+            $table->foreign('uie_id')->references('id')->on('user_insurance_enqueries')->onDelete('cascade');
         });
     }
 
@@ -36,6 +36,6 @@ class CreateUserInsuranceFillupsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_insurance_fillups');
+        Schema::dropIfExists('user_insurance_enqueries_details');
     }
 }

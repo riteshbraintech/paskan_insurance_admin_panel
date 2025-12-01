@@ -15,6 +15,9 @@ class CreateViriyahTokensTable extends Migration
     {
         Schema::create('viriyah_tokens', function (Blueprint $table) {
             $table->id();
+            $table->string('access_token')->nullable();
+            $table->string('refresh_token')->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }
