@@ -65,9 +65,9 @@ class CategoryFormFieldsRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique(CategoryFieldFormTranslation::class, 'label')
-                    ->ignore($this->getTranslationId($langCode)) // ignore existing record when updating
-                    ->where(fn($query) => $query->where('lang_code', $langCode))
+                // Rule::unique(CategoryFieldFormTranslation::class, 'label')
+                //     ->ignore($this->getTranslationId($langCode)) // ignore existing record when updating
+                //     ->where(fn($query) => $query->where('lang_code', $langCode))
             ];
 
             foreach ($translationRules as $key => $rule) {

@@ -45,9 +45,12 @@
                         <select id="categoryFilter" name="category_id" class="form-select">
                             <option value="">-- Filter by Category --</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->translation->title ?? 'Unnamed' }}</option>
+                                <option value="{{ $category->id }}" {{ $categoryID == $category->id ? 'selected' : '' }}>
+                                    {{ $category->translation->title ?? 'N/A' }}
+                                </option>
                             @endforeach
                         </select>
+
                     </div>
                 </div>
             </div>
@@ -67,7 +70,10 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('public/admin/js/common.js') }}"></script>
+    <script src="{{ asset('public/admin/js/common.js') }}"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
     <script>
         function changeStatus(event, id) {
             let url = "{{ route('admin.categoryformfield.change.status') }}" + "/" + id;
@@ -101,7 +107,7 @@
                     showFlashMessage('error', 'Server error occurred.');
                 }
             });
-        }     
+        }
 
         function filterchangeStatus(event, id) {
             let url = "{{ route('admin.categoryformfield.filterchange.status') }}" + "/" + id;
@@ -136,7 +142,6 @@
                 }
             });
         }
-           
     </script>
 
     <script>
@@ -146,6 +151,9 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
+
+            initSortable();
+
             // Base URL for Facebox assets
             var baseUrl = "{{ asset('public/admin/facebox') }}";
 
@@ -165,6 +173,12 @@
                 filterTable();
             });
 
+            if ($('#categoryFilter').val() !== "") {
+                filterTable();
+            }
+
+
+
             function filterTable(page = 1) {
                 let category_id = $('#categoryFilter').val();
                 let search = $('#search-input').val();
@@ -179,6 +193,7 @@
                     },
                     success: function(response) {
                         $('.load-table-data').html(response.html);
+                        initSortable();
                         // initializeFacebox();
                     },
                     error: function() {
@@ -186,6 +201,41 @@
                     }
                 });
             }
+
+            function initSortable() {
+                $(".load-table-data table tbody").sortable({
+                    placeholder: "ui-state-highlight",
+                    cursor: "move",
+                    update: function(event, ui) {
+                        let order = [];
+
+                        $(".load-table-data table tbody tr").each(function(index) {
+                            order.push({
+                                id: $(this).data('id'),
+                                position: index + 1
+                            });
+                        });
+
+                        $.ajax({
+                            url: "{{ route('admin.categoryformfield.reorder') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                order: order
+                            },
+                            success: function(response) {
+                                console.log('Order updated successfully');
+                                filterTable();
+                            },
+                            error: function(xhr) {
+                                alert('Sorting failed, please try again.');
+                            }
+                        });
+                    }
+                });
+            }
+
+
         });
     </script>
 @endpush

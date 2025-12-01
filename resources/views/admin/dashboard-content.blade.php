@@ -3,6 +3,7 @@
     $cmspage_count = $cmspages->count();
     $category_count = $categories->count();
     $user_count = $users->count();
+    $banner_count = $banner->count();
 
     $bid_count = $bid->count();
     $lead_count = $lead->whereNotIn('status', ['fake_lead', 'cancelled'])->count();
@@ -24,20 +25,49 @@
 @endphp
 
 <style>
-    .table-wrapper {
-        max-height: 370px;
-        /* control height */
-        overflow-y: auto;
-        /* enable vertical scroll */
+    .user-wrapper {
+        font-family: "Segoe UI", Arial, sans-serif;
+        width: 70%;
     }
 
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #fff;
-        /* keep background so rows don’t bleed under */
-        z-index: 2;
-        /* keep above rows */
+    .user-title {
+        color: #000000;
+         text-align: center;
+        padding: 15px 20px;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+        box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-table thead {
+        background-color: #0a0c35;
+        color: white;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    .user-table tbody tr {
+        border-bottom: 1px solid #e6e6e6;
+        transition: background 0.3s ease;
+    }
+
+    .user-table tbody tr:hover {
+        background-color: #f5f5f5;
     }
 </style>
 
@@ -47,7 +77,8 @@
             <div class="card-body">
                 <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                     <div class="w-100">
-                        <a href="javascript:void(0);" onclick="redirect('cmspage');" class="hover" style="cursor: default;">
+                        <a href="javascript:void(0);" onclick="redirect('cmspage');" class="hover"
+                            style="cursor: default;">
                             <p style="cursor: pointer;">Total CMSPage</p>
                             <h4 class="" id="example"><span style="cursor: pointer;" class="total_bids"
                                     onmouseover="showHiddenDiv(event)"
@@ -87,7 +118,7 @@
                                 <span style="cursor: pointer;" class="total_leads" onmouseover="showHiddenDiv(event)"
                                     onmouseout="hideHiddenDiv(event)">{{ $lead_count - $invited_open_count }}</span>
                                 ({{ round($lead_percentage, 2) }}%)</h4> --}}
-                                <h4 class="" id="example"><span style="cursor: pointer;" class="total_bids"
+                            <h4 class="" id="example"><span style="cursor: pointer;" class="total_bids"
                                     onmouseover="showHiddenDiv(event)"
                                     onmouseout="hideHiddenDiv(event)">{{ $category_count }}</span></h4>
                         </div>
@@ -121,25 +152,118 @@
     <div class="col">
         <div class="card overflow-hidden radius-10" style="height:142px;">
             <div class="card-body">
-                <a href="javascript:void(0);">
+                <a href="javascript:void(0);" onclick="redirect('user');" style="cursor: default;">
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div class="w-100">
-                            <p>Total User</p>
-                            <div class="d-flex flex-row">
-                                <a href="javascript:void(0);" onclick="redirect('hot_lead');">
-                                    <h4 class="">{{ $user_count }}</h4>
-                                </a>
-                                {{-- <p href="javascript:void(0);" class="d-flex mx-2 fs-4"><strong>/</strong></p>
-                                <a href="javascript:void(0);" onclick="redirect('hot_lead','off');">
-                                    <h4 class="">{{ $total_hot_lead }}</h4>
-                                </a> --}}
-                            </div>
+                            <p style="cursor: pointer;">Total User</p>
+
+                            {{-- <h4
+                                class=" text-{{ $lead_percentage < 8 ? 'danger' : ($lead_percentage >= 8 && $lead_percentage <= 12 ? 'warning' : 'success') }}">
+                                <span style="cursor: pointer;" class="total_leads" onmouseover="showHiddenDiv(event)"
+                                    onmouseout="hideHiddenDiv(event)">{{ $lead_count - $invited_open_count }}</span>
+                                ({{ round($lead_percentage, 2) }}%)</h4> --}}
+                            <h4 class="" id="example"><span style="cursor: pointer;" class="total_bids"
+                                    onmouseover="showHiddenDiv(event)"
+                                    onmouseout="hideHiddenDiv(event)">{{ $user_count }}</span></h4>
                         </div>
                     </div>
                 </a>
             </div>
         </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body"
+                    style="display:none;top:-7.5rem;padding:5px;width:13rem;height:auto;position:absolute;left:3rem;background-color:rgb(250, 246, 246);border-radius:5px;z-index:999;"
+                    id="hiddenDivLead">
+                    <div class="">
+
+                        <p style="margin-bottom: 2px;font-weight:500">Invited: {{ $invited_count }}</p>
+                        <p style="margin-bottom: 2px;font-weight:500">Lead: {{ $not_invited_count }}</p>
+
+                        @forelse ($staff_lead_list as $key => $val)
+                            <p style="margin-bottom: 2px;font-weight:500"
+                                class="text-{{ $val['percentage'] < 8 ? 'danger' : ($val['percentage'] >= 8 && $val['percentage'] <= 12 ? 'warning' : 'success') }}">
+                                {{ $key . ' - ' . $val['lead_count'] . ' (' . $val['percentage'] . '%)' }}</p>
+                        @empty
+                            <p>Data Not Found !!</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="col">
+        <div class="card overflow-hidden radius-10" style="height:142px;">
+            <div class="card-body">
+                <a href="javascript:void(0);" onclick="redirect('banner');" style="cursor: default;">
+                    <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+                        <div class="w-100">
+                            <p style="cursor: pointer;">Total Banner</p>
+
+                            {{-- <h4
+                                class=" text-{{ $lead_percentage < 8 ? 'danger' : ($lead_percentage >= 8 && $lead_percentage <= 12 ? 'warning' : 'success') }}">
+                                <span style="cursor: pointer;" class="total_leads" onmouseover="showHiddenDiv(event)"
+                                    onmouseout="hideHiddenDiv(event)">{{ $lead_count - $invited_open_count }}</span>
+                                ({{ round($lead_percentage, 2) }}%)</h4> --}}
+                            <h4 class="" id="example"><span style="cursor: pointer;" class="total_bids"
+                                    onmouseover="showHiddenDiv(event)"
+                                    onmouseout="hideHiddenDiv(event)">{{ $banner_count }}</span></h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body"
+                    style="display:none;top:-7.5rem;padding:5px;width:13rem;height:auto;position:absolute;left:3rem;background-color:rgb(250, 246, 246);border-radius:5px;z-index:999;"
+                    id="hiddenDivLead">
+                    <div class="">
+
+                        <p style="margin-bottom: 2px;font-weight:500">Invited: {{ $invited_count }}</p>
+                        <p style="margin-bottom: 2px;font-weight:500">Lead: {{ $not_invited_count }}</p>
+
+                        @forelse ($staff_lead_list as $key => $val)
+                            <p style="margin-bottom: 2px;font-weight:500"
+                                class="text-{{ $val['percentage'] < 8 ? 'danger' : ($val['percentage'] >= 8 && $val['percentage'] <= 12 ? 'warning' : 'success') }}">
+                                {{ $key . ' - ' . $val['lead_count'] . ' (' . $val['percentage'] . '%)' }}</p>
+                        @empty
+                            <p>Data Not Found !!</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userdisplay" class="user-wrapper">
+        <h2 class="user-title">Latest 10 Users</h2>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Registered Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach ($latest_contacts as $index => $contact)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $contact->fullname }}</td>
+                        <td>{{ $contact->email }}</td>
+                        <td>{{ $contact->created_at->format('d M Y') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+
 
     {{-- <div class="col">
         <div class="card overflow-hidden radius-10" style="height:142px;">
@@ -307,21 +431,21 @@
 
 @push('scripts')
     <script>
-        function showHiddenDiv(event) {
-            if (event.target.classList.contains('total_bids')) {
-                document.getElementById('hiddenDivBid').style.display = 'block';
-            } else if (event.target.classList.contains('total_leads')) {
-                document.getElementById('hiddenDivLead').style.display = 'block';
-            }
-        }
+        // function showHiddenDiv(event) {
+        //     if (event.target.classList.contains('total_bids')) {
+        //         document.getElementById('hiddenDivBid').style.display = 'block';
+        //     } else if (event.target.classList.contains('total_leads')) {
+        //         document.getElementById('hiddenDivLead').style.display = 'block';
+        //     }
+        // }
 
-        function hideHiddenDiv(event) {
-            if (event.target.classList.contains('total_bids')) {
-                document.getElementById('hiddenDivBid').style.display = 'none';
-            } else if (event.target.classList.contains('total_leads')) {
-                document.getElementById('hiddenDivLead').style.display = 'none';
-            }
-        }
+        // function hideHiddenDiv(event) {
+        //     if (event.target.classList.contains('total_bids')) {
+        //         document.getElementById('hiddenDivBid').style.display = 'none';
+        //     } else if (event.target.classList.contains('total_leads')) {
+        //         document.getElementById('hiddenDivLead').style.display = 'none';
+        //     }
+        // }
 
         function redirect(paramType = "", dateFilterEnabled = true) {
             let bidsFilter = "";
@@ -334,10 +458,14 @@
             if (paramType === 'cmspage') {
                 window.location.href = "{{ route('admin.cmspage.index') }}?staffFilter=" + staff_id + '&' + "dateRange=" +
                     date + '&' + "managerFilter=" + manager_id + '&' + "bidsFilter=" + bidsFilter;
-            } else if(paramType === 'category'){
+            } else if (paramType === 'category') {
                 window.location.href = "{{ route('admin.categories.index') }}?status=" + paramType + '&' + "staffFilter=" +
                     staff_id + '&' + "managerFilter=" + manager_id + '&' + "dateRange=" + date + '&' + "disabledBtn=" +
                     dateFilterEnabled;
+            } else if (paramType === 'user') {
+                window.location.href = "{{ route('admin.user.index') }}"
+            } else if (paramType === 'banner') {
+                window.location.href = "{{ route('admin.banner.index') }}"
             }
         }
     </script>
