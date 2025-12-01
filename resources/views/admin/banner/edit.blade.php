@@ -92,7 +92,7 @@
                             <div class="mb-4">
                                 <label>Banner Image</label><br>
                                 @if ($record->image)
-                                    <img src="{{ asset('/public/admin/banners/img/' . $record->image) }}" alt="Category Image" width="120">
+                                    <img src="{{ asset('/public/admin/banners/img/' . $record->image) }}" alt="Banner Image" width="120">
                                 @endif
                                 <input type="file" name="image" class="form-control">
                             </div>
