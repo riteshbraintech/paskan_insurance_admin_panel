@@ -44,8 +44,9 @@
                         <select id="insuranceFilter" name="insurance_id" class="form-select">
                             <option value="">-- Filter by Insurance --</option>
                             @foreach ($insurances as $insurance)
-                                <option value="{{ $insurance->id }}">
-                                    {{ $insurance->translation->title }}
+                                <option value="{{ $insurance->id }}" 
+                                    {{ ($request->insurance_id ?? $insuranceID) == $insurance->id ? 'selected' : '' }}>
+                                    {{ $insurance->translation->title ?? 'N/A' }}
                                 </option>
                             @endforeach
                         </select>
@@ -131,6 +132,10 @@
                 filterTable();
             });
 
+            if ($('#insuranceFilter').val() !== "") {
+                filterTable();
+            }
+
             function filterTable(page = 1) {
                 let insurance_id = $('#insuranceFilter').val();
                 let search = $('#search-input').val();
@@ -145,10 +150,44 @@
                     },
                     success: function(response) {
                         $('.load-table-data').html(response.html);
+                        initSortable();
                         // initializeFacebox();
                     },
                     error: function() {
                         alert('Something went wrong. Please try again.');
+                    }
+                });
+            }
+
+            function initSortable() {
+                $(".load-table-data table tbody").sortable({
+                    placeholder: "ui-state-highlight",
+                    cursor: "move",
+                    update: function(event, ui) {
+                        let order = [];
+
+                        $(".load-table-data table tbody tr").each(function(index) {
+                            order.push({
+                                id: $(this).data('id'),
+                                position: index + 1
+                            });
+                        });
+
+                        $.ajax({
+                            url: "{{ route('admin.categoryformfield.reorder') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                order: order
+                            },
+                            success: function(response) {
+                                console.log('Order updated successfully');
+                                filterTable();
+                            },
+                            error: function(xhr) {
+                                alert('Sorting failed, please try again.');
+                            }
+                        });
                     }
                 });
             }

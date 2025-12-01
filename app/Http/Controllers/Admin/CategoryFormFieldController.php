@@ -21,58 +21,17 @@ use Illuminate\Support\Facades\File;
 
 class CategoryFormFieldController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $current_page = $request->page ?? 1;
-    //     $search = $request->search ?? "";
-    //     $perPage = $request->perPage ?? 50;
-    //     $isAjax = $request->method;
-
-    //     $records = Categoryformfield::with(['translations','translation']);
-    //     if($search){
-    //         $records = $records->whereHas('translations', function($q) use($search){
-    //             $q->where('label', 'like', '%'.$search.'%');
-    //         }); 
-    //     }
-    //     // dd($records);
-    //     $records = $records->sortable('sort_order','asc')->paginate($perPage);
-
-    //     $categories = Category::with('translation')->get();
-
-    //     // always choosen first as default
-    //     $categoriesIDs = Category::with('translation')->first()->id ?? 0;
-    //     $request->merge([
-    //         'category_id' => $categoriesIDs 
-    //     ]);
-
-
-
-    //     if (!empty($isAjax)) {
-    //         $html = view('admin.categoriesformfield.table', compact('records'))->render();
-    //         return response()->json(['html' => $html]);
-    //     } else {
-    //         return view('admin.categoriesformfield.index', compact('records','categories'));
-    //     }
-
-    // }
-
     public function index(Request $request)
     {
         $current_page = $request->page ?? 1;
         $search = $request->search ?? "";
         $perPage = $request->perPage ?? 50;
-        $isAjax = $request->ajax();
+        $isAjax = $request->method;
 
-        // Get all categories
         $categories = Category::with('translation')->get();
-
         // Choose first category as default
         $defaultCategoryID = $categories->first()->id ?? null;
-
-        // Use request category_id or default
         $categoryID = $request->category_id ?? $defaultCategoryID;
-
-        // Records Query
         $records = Categoryformfield::with(['translations', 'translation'])
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('translations', function ($q) use ($search) {
@@ -84,15 +43,62 @@ class CategoryFormFieldController extends Controller
             })
             ->sortable(['sort_order' => 'asc'])
             ->paginate($perPage);
+        // dd($records);
 
-        // For AJAX Requests
-        if ($isAjax) {
+
+        // always choosen first as default
+        $request->merge([
+            'category_id' => $categoryID 
+        ]);
+
+
+
+        if (!empty($isAjax)) {
             $html = view('admin.categoriesformfield.table', compact('records'))->render();
             return response()->json(['html' => $html]);
+        } else {
+            return view('admin.categoriesformfield.index', compact('records','categories','categoryID'));
         }
 
-        return view('admin.categoriesformfield.index', compact('records', 'categories', 'categoryID'));
     }
+
+    // public function index(Request $request)
+    // {
+    //     $current_page = $request->page ?? 1;
+    //     $search = $request->search ?? "";
+    //     $perPage = $request->perPage ?? 50;
+    //     $isAjax = $request->ajax();
+
+    //     // Get all categories
+    //     $categories = Category::with('translation')->get();
+
+    //     // Choose first category as default
+    //     $defaultCategoryID = $categories->first()->id ?? null;
+
+    //     // Use request category_id or default
+    //     $categoryID = $request->category_id ?? $defaultCategoryID;
+
+    //     // Records Query
+    //     $records = Categoryformfield::with(['translations', 'translation'])
+    //         ->when($search, function ($query) use ($search) {
+    //             $query->whereHas('translations', function ($q) use ($search) {
+    //                 $q->where('label', 'like', '%' . $search . '%');
+    //             });
+    //         })
+    //         ->when($categoryID, function ($query) use ($categoryID) {
+    //             $query->where('category_id', $categoryID);
+    //         })
+    //         ->sortable(['sort_order' => 'asc'])
+    //         ->paginate($perPage);
+
+    //     // For AJAX Requests
+    //     if ($isAjax) {
+    //         $html = view('admin.categoriesformfield.table', compact('records'))->render();
+    //         return response()->json(['html' => $html]);
+    //     }
+
+    //     return view('admin.categoriesformfield.index', compact('records', 'categories', 'categoryID'));
+    // }
 
 
 
@@ -173,8 +179,9 @@ class CategoryFormFieldController extends Controller
 
             DB::commit();
 
+            
             return redirect()
-                ->route('admin.categoryformfield.index')
+                ->route('admin.categoryformfield.index',['category_id'=> $request->category_id])
                 ->with('success', 'Field created successfully.');
 
         } catch (\Throwable $th) {
@@ -296,7 +303,7 @@ class CategoryFormFieldController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.categoryformfield.index')
+                ->route('admin.categoryformfield.index',['category_id'=> $field->category_id])
                 ->with('success', 'Field updated successfully.');
 
         } catch (\Throwable $th) {

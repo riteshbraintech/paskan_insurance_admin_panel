@@ -42,24 +42,24 @@
                     @include('admin.elements.search')
 
                     <div class="col-md-3">
-                        {{-- <select id="categoryFilter" name="category_id" class="form-select">
+                        <select id="categoryFilter" name="category_id" class="form-select">
                             <option value="">-- Filter by Category --</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" {{ $categoryID == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}"
+                                    {{ ($request->category_id ?? $categoryID) == $category->id ? 'selected' : '' }}>
                                     {{ $category->translation->title ?? 'N/A' }}
                                 </option>
                             @endforeach
-                        </select> --}}
-                        <select id="categoryFilter" name="category_id" class="form-select">
+                        </select>
+
+                        {{-- <select id="categoryFilter" name="category_id" class="form-select">
                             <option value="">-- Filter by Category --</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}" {{ $categoryID == $category->id ? 'selected' : '' }}>
                                     {{ $category->translation->title ?? 'Unnamed' }}
                                 </option>
                             @endforeach
-                        </select>
-
-
+                        </select> --}}
                     </div>
                 </div>
             </div>
