@@ -17,6 +17,12 @@ class UserObserver
     {
         $admin = auth('admin')->user();
 
+        if(blank($admin)){
+            return;
+        }
+
+
+        // create admin log
         AdminLog::create([
             'admin_id'   => $admin->id,
             'event_name' => 'User Added By ' . $admin->name,
@@ -35,6 +41,10 @@ class UserObserver
     {
         // dd("hii");
         $admin = auth('admin')->user();
+        if(blank($admin)){
+            return;
+        }
+
         AdminLog::create([
             'admin_id'   => $admin->id,
             'event_name' => 'User Updated By ' . $admin->name,
@@ -56,6 +66,11 @@ class UserObserver
     {
         // dd($cMSPage);
         $admin = auth('admin')->user();
+
+        if(blank($admin)){
+            return;
+        }
+        
         AdminLog::create([
             'admin_id'   => $admin->id,
             'event_name' => 'user Deleted By ' . $admin->name,
