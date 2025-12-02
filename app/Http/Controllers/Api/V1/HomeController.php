@@ -275,13 +275,20 @@ class HomeController extends Controller
             // check if validation passed and user_id is null then create user and save enquiry data
             $userId = $request->input('user_id');
             if (is_null($userId)) {
-                $user = User::create([
-                    'name' => $request->input('user.name'),
-                    'email' => $request->input('user.email'),
-                    'phone' => $request->input('user.phone'),
-                    'password' => Hash::make('defaultpassword'), // set a default password or generate one
-                ]);
-                $userId = $user->id;
+                $emaildata = $request->input('user.email');
+                // check if user already exists with email
+                $existingUser = User::where('email', $emaildata)->first();
+                if ($existingUser) {
+                    $userId = $existingUser->id;
+                }else{
+                    $user = User::create([
+                        'name' => $request->input('user.name'),
+                        'email' => $request->input('user.email'),
+                        'phone' => $request->input('user.phone'),
+                        'password' => Hash::make('defaultpassword'), // set a default password or generate one
+                    ]);
+                    $userId = $user->id;
+                }
             }
 
             // Now save the enquiry data
