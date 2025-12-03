@@ -329,4 +329,30 @@ class HomeController extends Controller
         
     }
 
+    // get insurance list based on user fillup and category
+    public function categoryInsuranceQuotationList(Request $request, $slug)
+    {
+        try {
+           
+            // get category by slug
+            $category = Category::where('slug', $slug)->where('is_active', 1)->firstOrFail();
+
+            // get insurances based on category and user fillup data
+            $insurances = HomeService::getInsuranceQuotationList($category, $request);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Insurance Quotation List fetched successfully.',
+                'data'    => $insurances,
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+
+    }
+
 }

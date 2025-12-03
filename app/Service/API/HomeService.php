@@ -4,6 +4,7 @@ namespace App\Service\API;
 use App\Models\Categoryformfield;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
 use App\Models\CategoryFormFieldsOptionsRelation;
+use App\Service\ViriyahAuthService;
 
 /**
  * Class HomeService
@@ -96,6 +97,37 @@ class HomeService
         }
     }
 
+
+
+    public static function getInsuranceQuotationList($category, $request)
+    {
+
+
+        $payload = [
+            "agentCode"       => "09865",
+            "energyType"      => "C",
+            "carBrand"        => $request->carBrand,
+            "carModel"        => $request->carModel,
+            "carSubModel"     => $request->carSubModel,
+            "registrationYear"=> $request->registrationYear,
+            "vehicleTypeCode" => ["110"],
+        ];
+
+        $viriyahClass = new ViriyahAuthService();
+        $quotation = $viriyahClass->getMotorQuotation($payload);
+
+        return response()->json([$quotation, $payload]);
+        
+        // Implement your logic here to fetch and structure the data
+        $data = [
+            'message' => 'Welcome to the API Home Endpoint',
+            'timestamp' => now(),
+            // Add more data as needed
+        ];
+
+        return $data;
+    }
+
     /**
      * Alias of index() to satisfy "inde" naming if required.
      *
@@ -106,4 +138,6 @@ class HomeService
     {
         return $this->index($params);
     }
+
+
 }

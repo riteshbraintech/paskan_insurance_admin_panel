@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Service;
 
 use App\Models\ViriyahToken;
 use Carbon\Carbon;
@@ -56,7 +56,7 @@ class ViriyahAuthService
             "clientId" => $this->clientId,
             "clientSecret" => $this->clientSecret,
             "requestTime" => now()->format('Y-m-d\TH:i:s'),
-            "languagePreference" => "TH",
+            "languagePreference" => app()->getLocale(),
             "grantType" => "password",
             "username" => $this->username,
             "password" => $this->password,
@@ -101,12 +101,37 @@ class ViriyahAuthService
     {
         $token = ViriyahToken::firstOrNew();
 
-        $token->access_token  = $data['accessToken'] ?? null;
-        $token->refresh_token = $data['refreshToken'] ?? null;
-        $token->expires_at    = now()->addSeconds($data['expiresIn'] ?? 3600);
+        $token->access_token  = $data['access_token'] ?? null;
+        $token->refresh_token = $data['refresh_token'] ?? null;
+        $token->expires_at    = now()->addSeconds($data['expires_in'] ?? 3600);
 
         $token->save();
 
         return $token->access_token;
+    }
+
+
+    /**
+     * ⭐ NEW: MOTOR QUOTATION API (VMI V3)
+    */
+    public function getMotorQuotation(array $payload)
+    {
+        $token = $this->getValidToken();
+
+        $response = Http::withHeaders([
+            'Authorization'       => "Bearer ".$token,
+            'Content-Type'        => 'application/json',
+            'sourceTransID'       => 't102',
+            'clientId'            => $this->clientId,
+            'clientSecret'        => $this->clientSecret,
+            'requestTime'         => now()->format('Y-m-d\TH:i:s'),
+            'languagePreference'  => 'TH',
+        ])->post($this->baseUrl . '/api/policy/motor/vmi/v3/quotation', $payload);
+
+        if ($response->failed()) {
+            throw new \Exception("Viriyah Quotation Error: " . $response->body());
+        }
+
+        return $response->json();
     }
 }
