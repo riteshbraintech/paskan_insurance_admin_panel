@@ -25,7 +25,7 @@ class CategoryController extends Controller
             }); 
         }
 
-        $records = $records->sortable('id','desc')->paginate($perPage);
+        $records = $records->sortable('sort_order','asc')->paginate($perPage);
         // dd($records);
 
         if (!empty($isAjax)) {
@@ -87,6 +87,10 @@ class CategoryController extends Controller
         DB::beginTransaction();
 
         try {
+            // Get last sort order
+            $lastOrder = Category::max('sort_order');
+            $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
+
             // pick English or Thai title
             $englishTitle = $request->trans['en']['title'] ?? ($request->trans['th']['title'] ?? "hello");
 
@@ -121,6 +125,8 @@ class CategoryController extends Controller
                 'is_link' => $request->is_link ?? 0,
                 'is_active' => $request->is_active ?? 1,
                 'image' => $imageName,
+                'sort_order' => $newSortOrder,
+
             ]);
 
             // save translations
@@ -331,4 +337,15 @@ class CategoryController extends Controller
             'message' => "Category Link to Api status changed successfully.",
         ]);
     }
+
+    public function reorder(Request $request)
+    {
+        foreach ($request->order as $item) {
+            Category::where('id', $item['id'])
+                ->update(['sort_order' => $item['position']]);
+        }
+
+        return response()->json(['message' => 'Order updated successfully.']);
+    }
+
 }

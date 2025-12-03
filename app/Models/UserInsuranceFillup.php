@@ -27,4 +27,10 @@ class UserInsuranceFillup extends Model
     {
         return $this->belongsTo(Categoryformfield::class, 'formfieldname', 'id');
     }
+    public function enquery()
+    {
+        return $this->belongsTo(UserEnquery::class, 'user_insurance_enqueries_id');
+    }
+
 }
+

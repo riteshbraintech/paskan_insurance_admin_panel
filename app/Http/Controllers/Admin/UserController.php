@@ -139,20 +139,21 @@ class UserController extends Controller
         }
         
         
-
-        public function formfieldview(Request $request,$id)
+        public function formfieldview(Request $request, $id)
         {
-            // dd($id);
-            $user = User::find($id);
-            $records = UserInsuranceFillup::with(['category', 'formField','user'])
+            $user = User::findOrFail($id);
+
+            // Get all fillups for user, grouped by category
+            $records = UserInsuranceFillup::with(['category', 'formField'])
                 ->where('user_id', $id)
                 ->get()
                 ->groupBy('category_id');
 
-            // Get distinct categories the user has data for
+            // Get distinct categories
             $categories = Category::whereIn('id', $records->keys())->get();
 
-            return view('admin.userpage.formfieldview', compact('user','categories', 'records','id'));
+            return view('admin.userpage.formfieldview', compact('user','categories', 'records'));
         }
+
 
 }

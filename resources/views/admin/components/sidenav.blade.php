@@ -217,6 +217,16 @@
             </li>
         @endif
 
+        @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
+            <li class="{{ $segment == 'user_enquery' ? 'mm-active' : '' }}">
+                <a href="{{ route('admin.user_enquery.index') }}">
+                    <i class="fa-solid fa-phone"></i>
+                    <div class="menu-title">User Enquery</div>
+                </a>
+            </li>
+        @endif
+
+
         {{-- <li class="{{ $segment == 'project' ? 'mm-active' : '' }}">
             <a href="javascript:;" class="has-arrow dropdown">
                 <div class="parent-icon"><i class="fa-solid fa-p"></i></i></div>

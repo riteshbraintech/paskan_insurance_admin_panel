@@ -22,7 +22,6 @@
         <div class="text-center text-muted py-4">No insurance details found for this user.</div>
     @else
         @foreach ($categories as $category)
-            <!-- User Info Card -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-info text-white fw-bold d-flex justify-content-between align-items-center">
                     <span>{{ $category->title }}</span>
@@ -39,8 +38,8 @@
                         <tbody>
                             @foreach ($records[$category->id] ?? [] as $record)
                                 <tr>
-                                    <td>{{ $record->formField->label ?? 'N/A' }}</td>
-                                    <td>{{ $record->formfieldvalue ?? '-' }}</td>
+                                    <td>{{ $record->form_field_name ?? 'N/A' }}</td>
+                                    <td>{{ $record->form_field_value ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -48,5 +47,6 @@
                 </div>
             </div>
         @endforeach
+
     @endif
 </div>
