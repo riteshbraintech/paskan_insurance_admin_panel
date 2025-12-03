@@ -69,6 +69,8 @@
 @endpush
 
 @push('scripts')
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="{{ asset('public/admin/js/common.js') }}"></script>
     <script>
         function changeStatus(event, id) {

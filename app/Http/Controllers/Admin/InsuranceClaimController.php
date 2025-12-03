@@ -304,6 +304,4 @@ class InsuranceClaimController extends Controller
 
         return response()->json(['message' => 'Order updated successfully.']);
     }
-
-
 }
