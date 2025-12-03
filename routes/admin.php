@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\InsuranceClaimController;
 use App\Http\Controllers\Admin\InsuranceController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserInsuranceFillupController;
 
@@ -286,6 +287,9 @@ Route::prefix('/admin')->group(function () {
             Route::post('reorder', [InsuranceClaimController::class, 'reorder'])->name('admin.claiminsurance.reorder');
 
         });
+
+        Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+
 
     });
 

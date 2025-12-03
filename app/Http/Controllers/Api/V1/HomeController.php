@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\NewNotificationEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\BannerResource;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use App\Http\Resources\Api\V1\InsuranceClaimFAQResource;
 use App\Models\Contact;
 use App\Models\Insurance;
 use App\Models\InsuranceClaim;
+use App\Models\Notification;
+use App\Models\User;
 use App\Service\API\HomeService;
 
 class HomeController extends Controller
@@ -224,6 +227,30 @@ class HomeController extends Controller
             'subject'     => $request->subject,
             'message'     => $request->message,
         ]);
+
+        
+        // --------------- NOTIFICATION LOGIC -----------------
+        
+        // Find all admins
+        $admins = User::where('id', 1)->get(); // replace with actual admin user(s)
+
+        foreach($admins as $admin){
+            // Save notification in your table
+            $notification = Notification::create([
+                'user_id' => $admin->id,
+                'type'    => 'new_enquiry',
+                'title'   => 'New Insurance Enquiry',
+                'message' => "New enquiry from {$request->fullname} ({$request->email})",
+                // 'link'    => route('admin.contact.show', $contact->id), // Adjust route
+            ]);
+
+            // Broadcast notification via Pusher
+            event(new NewNotificationEvent($notification, "New message received!"));
+
+        }
+
+        // ---------------------------------------------------
+
 
         return response()->json([
             'status'  => true,

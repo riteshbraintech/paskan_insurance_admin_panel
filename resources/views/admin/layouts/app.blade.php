@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-id" content="{{ auth('admin')->id() }}">
+
+
 
     <title>{{ config('app.name', 'Paskan Insurance') }}</title>
     <link rel="icon" type="image/x-icon" href="{{ getImagePath('logo-icon.png', 'logo') }}">
@@ -46,6 +49,55 @@
 
     {{-- // load global scripts --}}
     @include('admin.layouts.scripts-cdn')
+
+    @vite(['resources/js/app.js'])
+
+    <script>
+        const userId = document.head.querySelector('meta[name="user-id"]').content;
+
+        console.log(userId);
+        
+        window.Echo.private(`user.${userId}`)
+            .listen('NewNotificationEvent', (notification) => {
+                console.log(notification);
+                alert(notification.message);
+
+                const countEl = document.getElementById('notificationCount');
+                if (countEl) {
+                    countEl.innerText = parseInt(countEl.innerText || '0') + 1;
+                }
+
+                const list = document.getElementById('notificationList');
+                if (list) {
+                    const a = document.createElement('a');
+                    a.href = notification.link || '#';
+                    a.className = 'dropdown-item fw-bold';
+                    a.innerHTML = `<div><strong>${notification.title}</strong></div>
+                               <div style="font-size:12px">${notification.message}</div>`;
+                    list.prepend(a);
+                }
+            });
+    </script>
+
+
+    <script>
+        document.addEventListener('click', function(e) {
+            const item = e.target.closest('.dropdown-item');
+            if (!item) return;
+            e.preventDefault();
+            const href = item.href;
+            fetch('/notifications/mark-as-read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: item.dataset.id
+                })
+            }).then(() => window.location = href);
+        });
+    </script>
 
     <script src="{{ loadAssets('date-range/daterangepicker.js') }}"></script>
 

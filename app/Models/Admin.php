@@ -87,4 +87,10 @@ class Admin extends Authenticatable
         return $this->belongsTo(Admin::class,'created_by','id');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
+
+
 }

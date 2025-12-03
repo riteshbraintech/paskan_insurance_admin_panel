@@ -29,22 +29,88 @@
                         </style>
                         <a class="nav-link" href="{{ route('admin.session.mode') }}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" style="cursor: pointer;" onclick="{window.location = '{{ route('admin.session.mode') }}'}" id="flexSwitchCheckDefault" {{ Request::session()->get('is_test') ? 'checked' : '' }}>  
-                                <label class="form-check-label" for="flexSwitchCheckDefaultdf" style="font-size: 14px;">Test Mode</label>
+                                <input class="form-check-input" type="checkbox" style="cursor: pointer;"
+                                    onclick="{window.location = '{{ route('admin.session.mode') }}'}"
+                                    id="flexSwitchCheckDefault"
+                                    {{ Request::session()->get('is_test') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="flexSwitchCheckDefaultdf"
+                                    style="font-size: 14px;">Test Mode</label>
                             </div>
                         </a>
                     </li>
                 @endif
 
+                {{-- @php
+                    $userId = auth()->id(); // or auth('admin')->id() if using admin guard
+                    $notifications = \App\Models\Notification::where('user_id', $userId)
+                        ->orderBy('created_at', 'desc')
+                        ->take(20)
+                        ->get();
+                    $unreadCount = \App\Models\Notification::where('user_id', $userId)
+                        ->where('is_read', false)
+                        ->count();
+                @endphp
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                        <i class="fa fa-bell"></i>
+                        <span id="notificationCount" class="badge bg-danger">{{ $unreadCount }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="width:360px;">
+                        <li>
+                            <div id="notificationList" style="max-height:400px; overflow:auto;">
+                                @foreach ($notifications as $n)
+                                    <a href="{{ $n->link ?? '#' }}"
+                                        class="dropdown-item {{ $n->is_read ? '' : 'fw-bold' }}"
+                                        data-id="{{ $n->id }}">
+                                        <div><strong>{{ $n->title }}</strong></div>
+                                        <div style="font-size:12px">{{ $n->message }}</div>
+                                        <small class="text-muted">{{ $n->created_at->diffForHumans() }}</small>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </li>
+                    </ul>
+                </li> --}}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                        <i class="fa fa-bell"></i>
+                        <span id="notificationCount"
+                            class="badge bg-danger">{{ auth('admin')->user()->notifications()->where('is_read', 0)->count() }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="width:360px;">
+                        <li>
+                            <div id="notificationList" style="max-height:400px; overflow:auto;">
+                                @foreach (auth('admin')->user()->notifications()->orderBy('created_at', 'desc')->take(20)->get() as $n)
+                                    <a href="{{ $n->link ?? '#' }}"
+                                        class="dropdown-item {{ $n->is_read ? '' : 'fw-bold' }}"
+                                        data-id="{{ $n->id }}">
+                                        <div><strong>{{ $n->title }}</strong></div>
+                                        <div style="font-size:12px">{{ $n->message }}</div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+
+
+
+
                 <li class="nav-item dropdown dropdown-user-setting">
-                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
+                        data-bs-toggle="dropdown">
                         <div class="user-setting d-flex align-items-center">
                             @if (!empty(admin()->user()->image))
-                                <img src="{{ getImagePath(admin()->user()->image, 'profile') }}" class="user-img" alt="">
+                                <img src="{{ getImagePath(admin()->user()->image, 'profile') }}" class="user-img"
+                                    alt="">
                             @else
-                                <img src="{{ loadAssets('images/avatars/avatar-1.png') }}" class="user-img" alt="">
+                                <img src="{{ loadAssets('images/avatars/avatar-1.png') }}" class="user-img"
+                                    alt="">
                             @endif
-                            <h6 class="mb-0 dropdown-user-name" style="margin-left: 8px;color:#000;">{{ Str::ucfirst(admin()->user()->name) }}</h6>
+                            <h6 class="mb-0 dropdown-user-name" style="margin-left: 8px;color:#000;">
+                                {{ Str::ucfirst(admin()->user()->name) }}</h6>
                         </div>
                     </a>
 
@@ -91,7 +157,8 @@
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <a class="dropdown-item" href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <a class="dropdown-item" href="route('logout')"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
                                     <div class="d-flex align-items-center">
                                         <div class=""><i class="fa-solid fa-right-from-bracket"></i></div>
                                         <div class="ms-3"><span>Logout</span></div>
