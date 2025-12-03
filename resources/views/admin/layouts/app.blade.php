@@ -53,31 +53,14 @@
     @vite(['resources/js/app.js'])
 
     <script>
-        const userId = document.head.querySelector('meta[name="user-id"]').content;
+        const userId = "{{ auth('admin')->id() }}";
 
-        console.log(userId);
-        
         window.Echo.private(`user.${userId}`)
             .listen('NewNotificationEvent', (notification) => {
                 console.log(notification);
-                alert(notification.message);
-
-                const countEl = document.getElementById('notificationCount');
-                if (countEl) {
-                    countEl.innerText = parseInt(countEl.innerText || '0') + 1;
-                }
-
-                const list = document.getElementById('notificationList');
-                if (list) {
-                    const a = document.createElement('a');
-                    a.href = notification.link || '#';
-                    a.className = 'dropdown-item fw-bold';
-                    a.innerHTML = `<div><strong>${notification.title}</strong></div>
-                               <div style="font-size:12px">${notification.message}</div>`;
-                    list.prepend(a);
-                }
             });
     </script>
+
 
 
     <script>
