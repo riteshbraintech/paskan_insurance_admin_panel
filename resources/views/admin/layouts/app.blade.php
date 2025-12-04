@@ -50,42 +50,53 @@
     {{-- // load global scripts --}}
     @include('admin.layouts.scripts-cdn')
 
-    @vite(['resources/js/app.js'])
-
-    <script>
-        const userId = "{{ auth('admin')->id() }}";
-
-        window.Echo.private(`user.${userId}`)
-            .listen('NewNotificationEvent', (notification) => {
-                console.log(notification);
-            });
-    </script>
-
-
-
-    <script>
-        document.addEventListener('click', function(e) {
-            const item = e.target.closest('.dropdown-item');
-            if (!item) return;
-            e.preventDefault();
-            const href = item.href;
-            fetch('/notifications/mark-as-read', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: item.dataset.id
-                })
-            }).then(() => window.location = href);
-        });
-    </script>
 
     <script src="{{ loadAssets('date-range/daterangepicker.js') }}"></script>
+    {{-- <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+
+        const pusher = new Pusher("41cf124fd4c4149e4335", {
+            cluster: "ap2"
+        });
+
+        const channel = pusher.subscribe("new-notification");
+
+        channel.bind("new-notification", function(data) {
+            console.log("Notification received:", data);
+        });
+    </script> --}}
 
     @stack('scripts')
 
 </body>
 
 </html>
+
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.0/echo.iife.js"></script>
+
+<script>
+    window.Echo = new Echo({
+        broadcaster: "pusher",
+        key: "{{ env('PUSHER_APP_KEY') }}",
+        cluster: "{{ env('PUSHER_APP_CLUSTER') }}",
+        forceTLS: false,
+        authEndpoint: "/admin/broadcasting/auth", // must match Broadcast::routes prefix
+        auth: {
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        }
+    });
+
+
+
+    window.Echo.private(`user.{{ auth()->id() }}`)
+        .listen(".new-notification", (data) => {
+            console.log(data);
+            alert(data);
+        });
+</script>

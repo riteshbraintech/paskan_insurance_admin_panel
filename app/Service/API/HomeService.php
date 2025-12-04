@@ -4,6 +4,7 @@ namespace App\Service\API;
 use App\Models\Categoryformfield;
 use App\Http\Resources\Api\V1\CategoryFieldResource;
 use App\Models\CategoryFormFieldsOptionsRelation;
+use App\Service\ViriyahAuthService;
 
 /**
  * Class HomeService
@@ -66,6 +67,68 @@ class HomeService
     }
 
     /**
+     * Return data for API index/home endpoint.
+     *
+     * @param array $params Optional parameters (filters, user context, etc)
+     * @return array Structured payload to be returned by the controller
+     */
+    public static function getAlluestionOfCategory($request, $category)
+    {
+        try {
+            // get first form fields
+            $catId = $category->id ?? null;
+
+
+            // get first form field of category
+            $formFieldsQuery = Categoryformfield::with(['translation','options','options.translation' ])->where('category_id', $catId)->orderBy('sort_order', 'asc');
+
+            $formFields = $formFieldsQuery->get();
+
+            // dd($formFields);
+            $questionCount = Categoryformfield::where('category_id', $catId)->count();
+
+            return [
+                'totalQuestions' => $questionCount,
+                'info' => CategoryFieldResource::collection($formFields)
+            ];
+            
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage(), 1);
+        }
+    }
+
+
+
+    public static function getInsuranceQuotationList($category, $request)
+    {
+
+
+        $payload = [
+            "agentCode"       => "09865",
+            "energyType"      => "C",
+            "carBrand"        => $request->carBrand,
+            "carModel"        => $request->carModel,
+            "carSubModel"     => $request->carSubModel,
+            "registrationYear"=> $request->registrationYear,
+            "vehicleTypeCode" => ["110"],
+        ];
+
+        $viriyahClass = new ViriyahAuthService();
+        $quotation = $viriyahClass->getMotorQuotation($payload);
+
+        return response()->json([$quotation, $payload]);
+        
+        // Implement your logic here to fetch and structure the data
+        $data = [
+            'message' => 'Welcome to the API Home Endpoint',
+            'timestamp' => now(),
+            // Add more data as needed
+        ];
+
+        return $data;
+    }
+
+    /**
      * Alias of index() to satisfy "inde" naming if required.
      *
      * @param array $params
@@ -75,4 +138,6 @@ class HomeService
     {
         return $this->index($params);
     }
+
+
 }

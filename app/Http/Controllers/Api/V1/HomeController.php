@@ -20,6 +20,13 @@ use App\Models\InsuranceClaim;
 use App\Models\Notification;
 use App\Models\User;
 use App\Service\API\HomeService;
+use App\Http\Requests\Api\V1\CategoryInqueirySubmit;
+use App\Models\User;
+use App\Models\UserEnquery;
+use App\Models\UserInsuranceFillup;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Api\V1\CategoryResourceWithDesc;
 
 class HomeController extends Controller
 {
@@ -30,7 +37,7 @@ class HomeController extends Controller
 
         // You may tweak queries: eager load, caching, per-page limits, etc.
         // 1️⃣ Get top 4 categories
-        $topcategories = Category::with('translation')
+        $topcategories = Category::with('translation')->where('is_link', 1)
             ->active()
             ->orderBy('created_at', 'asc') // or by any other priority column
             ->limit(4)
@@ -206,6 +213,33 @@ class HomeController extends Controller
         }
     }
 
+    // get category form fields by slug with pagination.
+    public function categoryAllDynamicFormFields(Request $request, $slug)
+    {
+        try {
+
+            // get category by slug
+            $category = Category::where('slug', $slug)->where('is_active', 1)->firstOrFail();
+
+            // get first form fields
+            $question = HomeService::getAlluestionOfCategory($request, $category);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Form Fields fetched successfully.',
+                'data'    => [
+                    'category'  => new CategoryResourceWithDesc($category),
+                    'question'  => $question,
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+    }
+
     //Fetch The Contact Form and Saved
     public function contactform(Request $request)
     {
@@ -259,5 +293,93 @@ class HomeController extends Controller
         ], 200);
     }
 
+
+    // categorySubmitEnquiry
+    public function categorySubmitEnquiry(CategoryInqueirySubmit $request)
+    {
+        try {
+            
+            // check if validation passed and user_id is null then create user and save enquiry data
+            $userId = $request->input('user_id');
+            if (is_null($userId)) {
+                $emaildata = $request->input('user.email');
+                // check if user already exists with email
+                $existingUser = User::where('email', $emaildata)->first();
+                if ($existingUser) {
+                    $userId = $existingUser->id;
+                }else{
+                    $user = User::create([
+                        'name' => $request->input('user.name'),
+                        'email' => $request->input('user.email'),
+                        'phone' => $request->input('user.phone'),
+                        'password' => Hash::make('defaultpassword'), // set a default password or generate one
+                    ]);
+                    $userId = $user->id;
+                }
+            }
+
+            // Now save the enquiry data
+            $categoryId = $request->input('category_id');
+
+            $userEnquery = UserEnquery::create([
+                'user_id' => $userId,
+                'category_id' => $categoryId,
+                'enqury_time' => now(),
+                'status' => 'new',
+            ]);
+
+            $choosenAnswers = $request->input('choosenAnswer');
+            foreach ($choosenAnswers as $fieldId => $answer) {
+                UserInsuranceFillup::create([
+                    'user_insurance_enqueries_id' => $userEnquery->id,
+                    'user_id' => $userId,
+                    'category_id' => $categoryId,
+                    'form_field_id' => $answer['form_field_id'] ?? '',
+                    'form_field_name' => $answer['form_field_name'] ?? '', // You can fetch and set the form field name if needed
+                    'form_field_value' => $answer['form_field_value'] ?? '',
+                ]);
+            }
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Your inquiry has been submitted successfully. Our Agent will contact you soon.',
+            ], 200);
+
+        //code...
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+        
+    }
+
+    // get insurance list based on user fillup and category
+    public function categoryInsuranceQuotationList(Request $request, $slug)
+    {
+        try {
+           
+            // get category by slug
+            $category = Category::where('slug', $slug)->where('is_active', 1)->firstOrFail();
+
+            // get insurances based on category and user fillup data
+            $insurances = HomeService::getInsuranceQuotationList($category, $request);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Insurance Quotation List fetched successfully.',
+                'data'    => $insurances,
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'  => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+
+    }
 
 }

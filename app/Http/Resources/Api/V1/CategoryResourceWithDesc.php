@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request; // ✅ Add this line
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class CategoryResourceWithDesc extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,7 +22,7 @@ class CategoryResource extends JsonResource
             'LinkToAPI'   => $this->is_link ? true : false,
             'image_url'   => $this->image_url ?? null,
             // 'is_active'   => (bool) $this->is_active,
-            // 'description' => $this->translation?->description,
+            'description' => $this->translation?->description,
             'meta' => [
                 'title'       => $this->translation?->meta_title,
                 'description' => $this->translation?->meta_description,

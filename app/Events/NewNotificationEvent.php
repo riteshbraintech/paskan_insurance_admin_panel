@@ -36,6 +36,12 @@ class NewNotificationEvent implements ShouldBroadcast
         return new PrivateChannel('user.'.$this->notification->user_id);
     }
 
+    public function broadcastAs()
+    {
+        return 'new-notification';
+    }
+
+
     public function broadcastWith()
     {
         return [

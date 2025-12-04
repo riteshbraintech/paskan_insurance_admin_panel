@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\InsuranceClaimController;
 use App\Http\Controllers\Admin\InsuranceController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserEnqueryController;
 use App\Http\Controllers\Admin\UserInsuranceFillupController;
 
 Route::prefix('/admin')->group(function () {
@@ -172,6 +173,7 @@ Route::prefix('/admin')->group(function () {
             Route::get('delete/{id?}', [CategoryController::class, 'delete'])->name('admin.categories.delete');
             Route::get('view/{id?}', [CategoryController::class, 'view'])->name('admin.categories.view');
             Route::post('apilinkstatus/{id?}', [CategoryController::class, 'changeapilinkStatus'])->name('admin.categories.change.linktoapistatus');
+            Route::post('reorder', [CategoryController::class, 'reorder'])->name('admin.categories.reorder');
         });
 
         // Category form field route
@@ -288,8 +290,23 @@ Route::prefix('/admin')->group(function () {
 
         });
 
-        Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        // Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
+
+        // User Enquery route
+        Route::group(['prefix'=>'user_enquery'],function(){
+            Route::get('/',[UserEnqueryController::class,'index'])->name('admin.user_enquery.index');
+            // Route::get('create', [UserEnqueryController::class, 'create'])->name('admin.user_enquery.create');
+            // Route::post('store', [UserEnqueryController::class, 'store'])->name('admin.user_enquery.store');
+            // Route::post('status/{id?}', [UserEnqueryController::class, 'changeStatus'])->name('admin.user_enquery.change.status');
+            // Route::get('edit/{id?}', [UserEnqueryController::class, 'edit'])->name('admin.user_enquery.edit');
+            // Route::post('update/{id?}', [UserEnqueryController::class, 'update'])->name('admin.user_enquery.update');
+            Route::get('delete/{id?}', [UserEnqueryController::class, 'delete'])->name('admin.user_enquery.delete');
+            Route::get('view/{id?}', [UserEnqueryController::class, 'view'])->name('admin.user_enquery.view');
+            // Route::get('filter', [UserEnqueryController::class, 'filter'])->name('admin.user_enquery.filter');
+            // Route::post('reorder', [UserEnqueryController::class, 'reorder'])->name('admin.user_enquery.reorder');
+
+        });
 
     });
 

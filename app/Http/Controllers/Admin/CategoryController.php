@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\NewNotificationEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -25,7 +27,7 @@ class CategoryController extends Controller
             }); 
         }
 
-        $records = $records->sortable('id','desc')->paginate($perPage);
+        $records = $records->sortable('sort_order','asc')->paginate($perPage);
         // dd($records);
 
         if (!empty($isAjax)) {
@@ -42,109 +44,208 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         // --- English ---
+    //         'trans.en.title' => 'required|string|max:255',
+    //         'trans.en.description' => 'required|string',
+    //         'trans.en.meta_title' => 'required|string|max:255',
+    //         'trans.en.meta_description' => 'required|string',
+    //         'trans.en.meta_keywords' => 'required|string|max:255',
+
+    //         // --- Thai ---
+    //         'trans.th.title' => 'required|string|max:255',
+    //         'trans.th.description' => 'required|string',
+    //         'trans.th.meta_title' => 'required|string|max:255',
+    //         'trans.th.meta_description' => 'required|string',
+    //         'trans.th.meta_keywords' => 'required|string|max:255',
+
+    //         // --- Optional ---
+    //         'is_active' => 'nullable|boolean',
+    //         'is_link' => 'nullable|boolean',
+    //         // --- Image validation ---
+    //         'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    //     ], [
+    //         // Custom error messages — English
+    //         'trans.en.title.required' => 'The English title is required.',
+    //         'trans.en.title.max' => 'The English title must not exceed 255 characters.',
+    //         'trans.en.description.required' => 'The English description is required.',
+    //         'trans.en.meta_title.required' => 'The English meta title is required.',
+    //         'trans.en.meta_description.required' => 'The English meta description is required.',
+    //         'trans.en.meta_keywords.required' => 'The English meta keywords are required.',
+
+    //         // Custom error messages — Thai
+    //         'trans.th.title.required' => 'The Thai title is required.',
+    //         'trans.th.title.max' => 'The Thai title must not exceed 255 characters.',
+    //         'trans.th.description.required' => 'The Thai description is required.',
+    //         'trans.th.meta_title.required' => 'The Thai meta title is required.',
+    //         'trans.th.meta_description.required' => 'The Thai meta description is required.',
+    //         'trans.th.meta_keywords.required' => 'The Thai meta keywords are required.',
+
+    //         // Optional field message
+    //         'is_active.boolean' => 'The active status must be true or false.',
+    //     ]);
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Get last sort order
+    //         $lastOrder = Category::max('sort_order');
+    //         $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
+
+    //         // pick English or Thai title
+    //         $englishTitle = $request->trans['en']['title'] ?? ($request->trans['th']['title'] ?? "hello");
+
+    //         if (is_null($englishTitle)) {
+    //             return redirect()->back()->withInput()->with('danger', "English or Thai title is required");
+    //         }
+
+    //         $slug = Str::slug($englishTitle);
+
+    //         // Check if slug already exists in categories table
+    //         if (\App\Models\Category::where('slug', $slug)->exists()) {
+    //             return redirect()->back()
+    //                 ->withErrors(['trans.en.title' => 'The slug generated from this English title already exists. Please choose a different title.'])
+    //                 ->withInput();
+    //         }
+
+    //         $imageName = null;
+    //         if ($request->hasFile('image')) {
+    //             $image = $request->file('image');
+    //             $uploadPath = public_path('admin/categories/img'); 
+    //             if (!file_exists($uploadPath)) {
+    //                 mkdir($uploadPath, 0777, true);
+    //             }
+    //             $imageName = time() . '.' . $image->getClientOriginalExtension();
+    //             $image->move($uploadPath, $imageName);
+    //         }
+
+    //         // Create main category
+    //         $categoryInfo = Category::create([
+    //             'title' => $englishTitle,
+    //             'slug' => $slug,
+    //             'is_link' => $request->is_link ?? 0,
+    //             'is_active' => $request->is_active ?? 1,
+    //             'image' => $imageName,
+    //             'sort_order' => $newSortOrder,
+
+    //         ]);
+
+    //         // save translations
+    //         foreach ($request->trans as $langCode => $trans) {
+    //             $categoryInfo->translations()->create([
+    //                 'lang_code' => $langCode,
+    //                 'title' => $trans['title'],
+    //                 'slug' => Str::slug($trans['title']),
+    //                 'description' => $trans['description'],
+    //                 'meta_title' => $trans['meta_title'],
+    //                 'meta_description' => $trans['meta_description'],
+    //                 'meta_keywords' => $trans['meta_keywords'],
+    //             ]);
+    //         }
+
+    //         DB::commit();
+
+    //         return redirect()->route('admin.categories.index')->with('success', "Category added successfully");
+    //     } catch (\Throwable $th) {
+    //         \Log::alert("CategoryController - Store Function : " . $th->getMessage());
+    //         DB::rollBack();
+    //         return redirect()->route('admin.categories.index')->with('danger', "Something went wrong");
+    //     }
+    // }
+
     public function store(Request $request)
-    {
-        $request->validate([
-            // --- English ---
-            'trans.en.title' => 'required|string|max:255',
-            'trans.en.description' => 'required|string',
-            'trans.en.meta_title' => 'required|string|max:255',
-            'trans.en.meta_description' => 'required|string',
-            'trans.en.meta_keywords' => 'required|string|max:255',
+{
+    $request->validate([
+        // --- English ---
+        'trans.en.title' => 'required|string|max:255',
+        'trans.en.description' => 'required|string',
+        'trans.en.meta_title' => 'required|string|max:255',
+        'trans.en.meta_description' => 'required|string',
+        'trans.en.meta_keywords' => 'required|string|max:255',
 
-            // --- Thai ---
-            'trans.th.title' => 'required|string|max:255',
-            'trans.th.description' => 'required|string',
-            'trans.th.meta_title' => 'required|string|max:255',
-            'trans.th.meta_description' => 'required|string',
-            'trans.th.meta_keywords' => 'required|string|max:255',
+        // --- Thai ---
+        'trans.th.title' => 'required|string|max:255',
+        'trans.th.description' => 'required|string',
+        'trans.th.meta_title' => 'required|string|max:255',
+        'trans.th.meta_description' => 'required|string',
+        'trans.th.meta_keywords' => 'required|string|max:255',
 
-            // --- Optional ---
-            'is_active' => 'nullable|boolean',
-            'is_link' => 'nullable|boolean',
-            // --- Image validation ---
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ], [
-            // Custom error messages — English
-            'trans.en.title.required' => 'The English title is required.',
-            'trans.en.title.max' => 'The English title must not exceed 255 characters.',
-            'trans.en.description.required' => 'The English description is required.',
-            'trans.en.meta_title.required' => 'The English meta title is required.',
-            'trans.en.meta_description.required' => 'The English meta description is required.',
-            'trans.en.meta_keywords.required' => 'The English meta keywords are required.',
+        'is_active' => 'nullable|boolean',
+        'is_link' => 'nullable|boolean',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
 
-            // Custom error messages — Thai
-            'trans.th.title.required' => 'The Thai title is required.',
-            'trans.th.title.max' => 'The Thai title must not exceed 255 characters.',
-            'trans.th.description.required' => 'The Thai description is required.',
-            'trans.th.meta_title.required' => 'The Thai meta title is required.',
-            'trans.th.meta_description.required' => 'The Thai meta description is required.',
-            'trans.th.meta_keywords.required' => 'The Thai meta keywords are required.',
+    DB::beginTransaction();
 
-            // Optional field message
-            'is_active.boolean' => 'The active status must be true or false.',
-        ]);
-        DB::beginTransaction();
+    try {
+        $lastOrder = Category::max('sort_order');
+        $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
 
-        try {
-            // pick English or Thai title
-            $englishTitle = $request->trans['en']['title'] ?? ($request->trans['th']['title'] ?? "hello");
+        $englishTitle = $request->trans['en']['title'] ?? ($request->trans['th']['title'] ?? "hello");
 
-            if (is_null($englishTitle)) {
-                return redirect()->back()->withInput()->with('danger', "English or Thai title is required");
-            }
+        $slug = Str::slug($englishTitle);
 
-            $slug = Str::slug($englishTitle);
-
-            // Check if slug already exists in categories table
-            if (\App\Models\Category::where('slug', $slug)->exists()) {
-                return redirect()->back()
-                    ->withErrors(['trans.en.title' => 'The slug generated from this English title already exists. Please choose a different title.'])
-                    ->withInput();
-            }
-
-            $imageName = null;
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $uploadPath = public_path('admin/categories/img'); 
-                if (!file_exists($uploadPath)) {
-                    mkdir($uploadPath, 0777, true);
-                }
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move($uploadPath, $imageName);
-            }
-
-            // Create main category
-            $categoryInfo = Category::create([
-                'title' => $englishTitle,
-                'slug' => $slug,
-                'is_link' => $request->is_link ?? 0,
-                'is_active' => $request->is_active ?? 1,
-                'image' => $imageName,
-            ]);
-
-            // save translations
-            foreach ($request->trans as $langCode => $trans) {
-                $categoryInfo->translations()->create([
-                    'lang_code' => $langCode,
-                    'title' => $trans['title'],
-                    'slug' => Str::slug($trans['title']),
-                    'description' => $trans['description'],
-                    'meta_title' => $trans['meta_title'],
-                    'meta_description' => $trans['meta_description'],
-                    'meta_keywords' => $trans['meta_keywords'],
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()->route('admin.categories.index')->with('success', "Category added successfully");
-        } catch (\Throwable $th) {
-            \Log::alert("CategoryController - Store Function : " . $th->getMessage());
-            DB::rollBack();
-            return redirect()->route('admin.categories.index')->with('danger', "Something went wrong");
+        if (Category::where('slug', $slug)->exists()) {
+            return redirect()->back()
+                ->withErrors(['trans.en.title' => 'The slug generated from this English title already exists. Please choose a different title.'])
+                ->withInput();
         }
+
+        $imageName = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadPath = public_path('admin/categories/img');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move($uploadPath, $imageName);
+        }
+
+        $categoryInfo = Category::create([
+            'title' => $englishTitle,
+            'slug' => $slug,
+            'is_link' => $request->is_link ?? 0,
+            'is_active' => $request->is_active ?? 1,
+            'image' => $imageName,
+            'sort_order' => $newSortOrder,
+        ]);
+
+        foreach ($request->trans as $langCode => $trans) {
+            $categoryInfo->translations()->create([
+                'lang_code' => $langCode,
+                'title' => $trans['title'],
+                'slug' => Str::slug($trans['title']),
+                'description' => $trans['description'],
+                'meta_title' => $trans['meta_title'],
+                'meta_description' => $trans['meta_description'],
+                'meta_keywords' => $trans['meta_keywords'],
+            ]);
+        }
+
+        // --- Send Notification ---
+        $notification = Notification::create([
+            'user_id' => auth()->id(), 
+            'title' => "New Category Created",
+            'message' => "Category '{$categoryInfo->title}' has been created successfully.",
+            'link' => route('admin.categories.index'),
+        ]);
+
+        event(new NewNotificationEvent($notification));
+
+        DB::commit();
+
+        return redirect()->route('admin.categories.index')->with('success', "Category added successfully");
+
+    } catch (\Throwable $th) {
+        \Log::alert("CategoryController - Store Function : " . $th->getMessage());
+        DB::rollBack();
+        return redirect()->route('admin.categories.index')->with('danger', "Something went wrong");
     }
+}
+
 
 
     public function changeStatus($id)
@@ -331,4 +432,15 @@ class CategoryController extends Controller
             'message' => "Category Link to Api status changed successfully.",
         ]);
     }
+
+    public function reorder(Request $request)
+    {
+        foreach ($request->order as $item) {
+            Category::where('id', $item['id'])
+                ->update(['sort_order' => $item['position']]);
+        }
+
+        return response()->json(['message' => 'Order updated successfully.']);
+    }
+
 }

@@ -13,11 +13,12 @@ class CreateUserEnqueriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_enqueries', function (Blueprint $table) {
+        Schema::create('user_insurance_enqueries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id'); 
             $table->unsignedBigInteger('category_id'); 
             $table->dateTime('enquerytime')->useCurrent();
+            $table->string('status')->default('new')->comment('new, processed, closed');
             $table->timestamps();
 
             // Foreign Key
@@ -33,6 +34,6 @@ class CreateUserEnqueriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_enqueries');
+        Schema::dropIfExists('user_insurance_enqueries');
     }
 }

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +46,12 @@ Route::redirect('/', 'admin/dashboard');
 
 // all admin route
 require __DIR__.'/admin.php';
+
+
+
+Broadcast::routes([
+    'prefix' => 'admin',                // optional, for /admin/broadcasting/auth
+    'middleware' => ['auth:admin']      // use your admin guard
+]);
+
+
