@@ -21,33 +21,54 @@
 
     <!-- Translations -->
     <div class="card shadow-sm">
-        <div class="card-header bg-info text-white fw-bold">
+        {{-- <div class="card-header bg-info text-white fw-bold">
             Translations 
-            @if($record->is_active)
+            @if ($record->is_active)
                 <span class="badge bg-success">Active</span>
             @else
                 <span class="badge bg-danger">Inactive</span>
             @endif
             
-        </div>
+        </div> --}}
         <div class="card-body">
-                <div class="border rounded p-3 mb-4">
-                   
-                    <table class="table table-bordered mb-0">
+            <div class="border rounded p-3 mb-4">
+
+                <table class="table table-bordered mb-0">
+                    <tr>
+                        <th width="25%">Full Name</th>
+                        <td>{{ $record->user->name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td>{!! $record->category->title !!}</td>
+                    </tr>
+                    <tr>
+                        <th>Enquery Time</th>
+                        <td>{{ $record->enquery_time }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>{{ $record->status }}</td>
+                    </tr>
+                </table>
+                <table class="table table-bordered mt-3">
+                    <thead>
                         <tr>
-                            <th width="25%">Full Name</th>
-                            <td>{{ $record->user->name }}</td>
+                            <th>Field Name</th>
+                            <th>Field Value</th>
                         </tr>
-                        <tr>
-                            <th>Category</th>
-                            <td>{!! $record->category->title !!}</td>
-                        </tr>
-                        <tr>
-                            <th>Enquery Time</th>
-                            <td>{{ $record->enquery_time }}</td>
-                        </tr>
-                    </table>
-                </div>
+                    </thead>
+                    <tbody>
+                        @foreach ($record->fillups as $item)
+                            <tr>
+                                <td>{{ $item->form_field_name }}</td>
+                                <td>{{ $item->form_field_value }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+            </div>
         </div>
     </div>
 

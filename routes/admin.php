@@ -292,15 +292,8 @@ Route::prefix('/admin')->group(function () {
         // User Enquery route
         Route::group(['prefix'=>'user_enquery'],function(){
             Route::get('/',[UserEnqueryController::class,'index'])->name('admin.user_enquery.index');
-            // Route::get('create', [UserEnqueryController::class, 'create'])->name('admin.user_enquery.create');
-            // Route::post('store', [UserEnqueryController::class, 'store'])->name('admin.user_enquery.store');
-            // Route::post('status/{id?}', [UserEnqueryController::class, 'changeStatus'])->name('admin.user_enquery.change.status');
-            // Route::get('edit/{id?}', [UserEnqueryController::class, 'edit'])->name('admin.user_enquery.edit');
-            // Route::post('update/{id?}', [UserEnqueryController::class, 'update'])->name('admin.user_enquery.update');
-            Route::get('delete/{id?}', [UserEnqueryController::class, 'delete'])->name('admin.user_enquery.delete');
             Route::get('view/{id?}', [UserEnqueryController::class, 'view'])->name('admin.user_enquery.view');
-            // Route::get('filter', [UserEnqueryController::class, 'filter'])->name('admin.user_enquery.filter');
-            // Route::post('reorder', [UserEnqueryController::class, 'reorder'])->name('admin.user_enquery.reorder');
+            Route::put('status/{id}', [UserEnqueryController::class, 'updateStatus'])->name('admin.user_enquery.updateStatus');
 
         });
 

@@ -13,12 +13,15 @@ use App\Models\Lead;
 use App\Models\Portal;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserEnquery;
 use App\Scopes\IsClonedScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Session;
+use Carbon\Carbon;
+
 class DashboardController extends Controller
 {
 
@@ -38,6 +41,16 @@ class DashboardController extends Controller
         $users = User::all();
         $latest_contacts = Contact::latest()->take(10)->get();
         $banner = Banner::with('translations')->where('is_active' , 1)->get();
+
+        // $recentEnquiries = UserEnquery::where('enquery_time', '>=', Carbon::now()->subDays(3))
+        //     ->orderBy('enquery_time', 'desc')
+        //     ->get();
+
+        $recentEnquiries = UserEnquery::with(['fillups.formField'])
+            ->where('enquery_time', '>=', Carbon::now()->subDays(3))
+            ->orderBy('enquery_time', 'desc')
+            ->get();
+            // dd($recentEnquiries);
 
         $staffs_list = $staffs_dd = [];
         $role_id = admin()->user()->role_id;
@@ -188,7 +201,7 @@ class DashboardController extends Controller
             $archieved = $data['archieved'];
             $short_fall = $data['short_fall'];
             
-            return view('admin.dashboard',compact('cmspages', 'categories', 'users', 'latest_contacts','banner','staff_bid_list','staff_lead_list','bid','lead','hot_lead','awardeds','staffs_dd','managers_dd','calnder_datas','month_dates','record','awarded_per_month','graph_filter','todayFollowUpLeads','total_hot_lead','portals','target','received','archieved','short_fall'));
+            return view('admin.dashboard',compact('cmspages', 'categories', 'users', 'latest_contacts','banner','recentEnquiries','staff_bid_list','staff_lead_list','bid','lead','hot_lead','awardeds','staffs_dd','managers_dd','calnder_datas','month_dates','record','awarded_per_month','graph_filter','todayFollowUpLeads','total_hot_lead','portals','target','received','archieved','short_fall'));
         }        
     }
 

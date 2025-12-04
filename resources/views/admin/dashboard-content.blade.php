@@ -24,7 +24,7 @@
     }
 @endphp
 
-<style>
+{{-- <style>
     .user-wrapper {
         font-family: "Segoe UI", Arial, sans-serif;
         width: 70%;
@@ -32,7 +32,7 @@
 
     .user-title {
         color: #000000;
-         text-align: center;
+        text-align: center;
         padding: 15px 20px;
         margin: 0;
         font-size: 20px;
@@ -69,7 +69,7 @@
     .user-table tbody tr:hover {
         background-color: #f5f5f5;
     }
-</style>
+</style> --}}
 
 <div class="row">
     <div class="col">
@@ -237,31 +237,126 @@
         </div>
     </div>
 
-    <div id="userdisplay" class="user-wrapper">
-        <h2 class="user-title">Latest 10 Users</h2>
+    <div style="width: 100%;">
+        <div style="display: flex; gap: 20px; align-items: flex-start;">
 
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Registered Date</th>
-                </tr>
-            </thead>
+            <!-- Left Table -->
+            <div style="width: 50%;">
+                <h4 class="user-title" style="text-align: center">Latest Users</h4>
 
-            <tbody>
-                @foreach ($latest_contacts as $index => $contact)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $contact->fullname }}</td>
-                        <td>{{ $contact->email }}</td>
-                        <td>{{ $contact->created_at->format('d M Y') }}</td>
-                    </tr>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Registered Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($latest_contacts as $index => $contact)
+                            <tr>
+                                <td>{{ $contact->fullname }}</td>
+                                <td>{{ $contact->email }}</td>
+                                <td>{{ $contact->created_at->format('d M Y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Right Table: Latest Enquiry -->
+            <div style="width: 50%;">
+                <h4 class="user-title" style="text-align: center">Latest Enquiry</h4>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Fields</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recentEnquiries as $enquiry)
+                            <tr>
+                                <td>{{ $enquiry->user->name ?? '' }}</td>
+                                <td>{{ $enquiry->category->title ?? '' }}</td>
+                                <td>{{ $enquiry->status }}</td>
+                                <td>
+                                    {{-- <button class="btn btn-sm " data-bs-toggle="modal"
+                                        data-bs-target="#detailsModal{{ $enquiry->id }}">
+                                        <i class="fa fa-eye"></i>
+                                    </button> --}}
+                                    <button class="btn btn-sm p-0" style="border:none; background:none;"
+                                        data-bs-toggle="modal" data-bs-target="#detailsModal{{ $enquiry->id }}">
+                                        <i class="fa fa-eye text-primary" style="font-size:16px;"></i>
+                                    </button>
+
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <!-- All Modals Placed Outside Table -->
+                @foreach ($recentEnquiries as $enquiry)
+                    <div class="modal fade" id="detailsModal{{ $enquiry->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        Enquiry Details - {{ $enquiry->user->name }}
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <p><strong>Category:</strong> {{ $enquiry->category->title ?? '' }}</p>
+                                    <p><strong>Status:</strong> {{ $enquiry->status }}</p>
+                                    <p><strong>Time:</strong> {{ $enquiry->enquery_time }}</p>
+                                    <hr>
+
+                                    <table class="table table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Field Name</th>
+                                                <th>Field Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if ($enquiry->fillups->isEmpty())
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted">
+                                                        No Data Found
+                                                    </td>
+                                                </tr>
+                                            @else
+                                                @foreach ($enquiry->fillups as $fillup)
+                                                    <tr>
+                                                        <td>{{ $fillup->form_field_name }}</td>
+                                                        <td>{{ $fillup->form_field_value }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 @endforeach
-            </tbody>
-        </table>
+
+            </div>
+        </div>
     </div>
+
 
 
 
