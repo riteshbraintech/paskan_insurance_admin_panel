@@ -36,7 +36,7 @@ class HomeController extends Controller
         // 1️⃣ Get top 4 categories
         $topcategories = Category::with('translation')->where('is_link', 1)
             ->active()
-            ->orderBy('created_at', 'asc') // or by any other priority column
+            ->orderBy('sort_order', 'asc') // or by any other priority column
             ->limit(4)
             ->get();
 
@@ -44,7 +44,9 @@ class HomeController extends Controller
         $randomCategories = Category::with('translation')
             ->active()
             ->whereNotIn('id', $topcategories->pluck('id')) // exclude top 4
-            ->inRandomOrder()
+            // ->inRandomOrder()
+            ->where('is_link', 0)
+            ->orderBy('sort_order', 'asc') // or by any other priority column
             ->limit(4)
             ->get();
 
