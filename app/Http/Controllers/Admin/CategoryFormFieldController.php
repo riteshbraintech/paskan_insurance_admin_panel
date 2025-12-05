@@ -301,8 +301,9 @@ class CategoryFormFieldController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.categoryformfield.index',['category_id'=> $request->category_id])
+                ->route('admin.categoryformfield.index', ['category_id' => $field->category_id])
                 ->with('success', 'Field updated successfully.');
+
 
         } catch (\Throwable $th) {
 
