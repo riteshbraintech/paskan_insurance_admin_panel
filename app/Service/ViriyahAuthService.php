@@ -26,7 +26,7 @@ class ViriyahAuthService
     /**
      * Return valid token (auto refresh if expired)
      */
-    public function getValidToken(): string
+    public function getValidToken(): string|null
     {
         $token = ViriyahToken::first();
 
@@ -48,7 +48,7 @@ class ViriyahAuthService
     /**
      * Step 1: Generate new token
      */
-    public function generateToken(): string
+    public function generateToken(): string|null
     {
         $response = Http::withHeaders([
             "Content-Type" => "application/json",
@@ -71,7 +71,7 @@ class ViriyahAuthService
     /**
      * Step 2: Refresh Token
      */
-    public function refreshToken(): string
+    public function refreshToken(): string|null
     {
         $token = ViriyahToken::first();
 
@@ -97,7 +97,7 @@ class ViriyahAuthService
     /**
      * Store access token + refresh token
      */
-    private function storeToken($data): string
+    private function storeToken($data): string|null
     {
         $token = ViriyahToken::firstOrNew();
 
