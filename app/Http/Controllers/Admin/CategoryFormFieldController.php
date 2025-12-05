@@ -85,6 +85,11 @@ class CategoryFormFieldController extends Controller
             ->sortable(['sort_order' => 'asc'])
             ->paginate($perPage);
 
+            // always choosen first as default
+            $request->merge([
+                'category_id' => $categoryID 
+            ]);
+
         // For AJAX Requests
         if ($isAjax) {
             $html = view('admin.categoriesformfield.table', compact('records'))->render();
@@ -174,7 +179,7 @@ class CategoryFormFieldController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.categoryformfield.index')
+                ->route('admin.categoryformfield.index',['category_id'=> $request->category_id])
                 ->with('success', 'Field created successfully.');
 
         } catch (\Throwable $th) {
@@ -296,7 +301,7 @@ class CategoryFormFieldController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.categoryformfield.index')
+                ->route('admin.categoryformfield.index',['category_id'=> $request->category_id])
                 ->with('success', 'Field updated successfully.');
 
         } catch (\Throwable $th) {
