@@ -89,6 +89,7 @@ class CategoryController extends Controller
         try {
             // Get last sort order
             $lastOrder = Category::max('sort_order');
+            
             $newSortOrder = $lastOrder ? $lastOrder + 1 : 1;
 
             // pick English or Thai title
@@ -295,13 +296,20 @@ class CategoryController extends Controller
 
         // Delete image if it exists
         if (!empty($category->image)) {
-            $imagePath = public_path('/public/admin/categories/img/' . $category->image);
+            $imagePath = public_path('admin/categories/img/' . $category->image);
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
         }
+
         // Delete record
         $category->delete();
+
+        // Reorder sort_order values after delete
+        $categories = Category::orderBy('sort_order')->get();
+        foreach ($categories as $index => $cat) {
+            $cat->update(['sort_order' => $index + 1]);
+        }
 
         return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
