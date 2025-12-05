@@ -19,17 +19,8 @@ class UserEnqueryController extends Controller
         // Remove translation relations
         // $records = UserEnquery::query();
         $records=UserEnquery::with('fillups');
-        // dd($records->get());
 
-        // Simple search on contact table only
-        // $records = $records->where(function ($q) use ($search) {
-        //     $q->where('fullname', 'like', "%$search%")
-        //     ->orWhere('email', 'like', "%$search%")
-        //     ->orWhere('phonenumber', 'like', "%$search%")
-        //     ->orWhere('subject', 'like', "%$search%");
-        // });
-
-
+   
        $records = $records->orderby('id', 'desc')->paginate($perPage);
         // Handle AJAX (table reload only)
         if ($isAjax) {
@@ -41,21 +32,22 @@ class UserEnqueryController extends Controller
         return view('admin.user_enquery.index', compact('records'));
     }
 
-    public function delete($id)
-    {
-        $contact = UserEnquery::findOrFail($id);
-
-        // Delete record
-        $contact->delete();
-
-        return redirect()->route('admin.user_enquery.index')->with('success', 'Contact deleted successfully.');
-    }
 
     public function view($id)
     {
-        // Load only the main record (NO translations)
-        $record = UserEnquery::findOrFail($id);
-// dd($record);
+        $record = UserEnquery::with(['fillups', 'user', 'category'])->findOrFail($id);
+
         return view('admin.user_enquery.view', compact('record'));
     }
+
+
+    public function updateStatus(Request $request, $id)
+    {
+        $item = UserEnquery::findOrFail($id);
+        $item->status = $request->status;
+        $item->save();
+
+        return back()->with('success', 'Status updated successfully');
+    }
+
 }

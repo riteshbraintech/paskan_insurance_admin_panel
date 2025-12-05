@@ -220,7 +220,7 @@
         @if (in_array($role_id, [\App\Models\Role::ADMIN, \App\Models\Role::SUPERADMIN, \App\Models\Role::MANAGER]))
             <li class="{{ $segment == 'user_enquery' ? 'mm-active' : '' }}">
                 <a href="{{ route('admin.user_enquery.index') }}">
-                    <i class="fa-solid fa-phone"></i>
+                    <i class="fa-solid fa-clipboard-list"></i>
                     <div class="menu-title">User Enquery</div>
                 </a>
             </li>

@@ -15,23 +15,40 @@
         </thead>
         <tbody>
             @forelse ($records as $key => $item)
-
                 <tr class="">
                     <td>{{ $i }}</td>
-                    <td>{{$item->user->name}}</td>
-                    <td>{{$item->category->title}}</td>
-                    <td>{{$item->enquery_time}}</td>
-                    <td>{{$item->status}}</td>
+                    <td>{{ $item->user->name }}</td>
+                    <td>{{ $item->category->title }}</td>
+                    <td>{{ $item->enquery_time }}</td>
+                    {{-- <td>{{$item->status}}</td> --}}
+                    <td>
+                        <form action="{{ route('admin.user_enquery.updateStatus', $item->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="new" {{ $item->status == 'new' ? 'selected' : '' }}>New
+                                </option>
+                                <option value="processing" {{ $item->status == 'processing' ? 'selected' : '' }}>
+                                    Processing</option>
+                                </option>
+                                </option>
+                                <option value="closed" {{ $item->status == 'closed' ? 'selected' : '' }}>Closed
+                                </option>
+                            </select>
+                        </form>
+                    </td>
+
                     <td>
                         <div class="table-actions d-flex align-items-center gap-3 fs-6">
                             <a href="{{ route('admin.user_enquery.view', ['id' => $item->id]) }}"
                                 class="text-success facebox" rel="facebox" data-bs-toggle="tooltip"
                                 data-bs-placement="bottom" title="View"><i class="fa-solid fa-eye fs-5"></i></a>
-                                
-                            <a href="javascript:void(0);"
+
+                            {{-- <a href="javascript:void(0);"
                                 onclick="deleteItem('{{ route('admin.user_enquery.delete', ['id' => $item->id]) }}')"
                                 class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                title="Delete"><i class="fa-solid fa-trash fs-5"></i></a>
+                                title="Delete"><i class="fa-solid fa-trash fs-5"></i></a> --}}
                         </div>
                     </td>
                 </tr>
