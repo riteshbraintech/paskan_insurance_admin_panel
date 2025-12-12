@@ -121,7 +121,7 @@ class ViriyahAuthService
         $response = Http::withHeaders([
             'Authorization'       => "Bearer ".$token,
             'Content-Type'        => 'application/json',
-            'sourceTransID'       => 't102',
+            'sourceTransID'       => '3dddb121-9140-4016-85d9-d9b22fabfae0',
             'clientId'            => $this->clientId,
             'clientSecret'        => $this->clientSecret,
             'requestTime'         => now()->format('Y-m-d\TH:i:s'),

@@ -107,17 +107,25 @@ class HomeService
 
 
         $payload = [
-            "agentCode"       => "09865",
-            "energyType"      => "C",
+            // "agentCode"       => "09865",
+            // "energyType"      => "C",
             "carBrand"        => $request->carBrand,
             "carModel"        => $request->carModel,
-            "carSubModel"     => $request->carSubModel,
-            "registrationYear"=> $request->registrationYear,
-            "vehicleTypeCode" => ["110"],
+            // "carSubModel"     => $request->carSubModel,
+            // "registrationYear"=> $request->registrationYear,
+            // "vehicleTypeCode" => [
+            //     "110",
+            //     "120",
+            //     "210",
+            //     "220",
+            //     "320"
+            // ],
         ];
+        // dd($payload);
 
         $viriyahClass = new ViriyahAuthService();
         // $quotation = $viriyahClass->getMotorQuotation($payload);
+        // dd($quotation);
 
         // return response()->json([$quotation, $payload]);
         
