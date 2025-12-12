@@ -44,8 +44,9 @@
                         <select id="insuranceFilter" name="insurance_id" class="form-select">
                             <option value="">-- Filter by Insurance --</option>
                             @foreach ($insurances as $insurance)
-                                <option value="{{ $insurance->id }}">
-                                    {{ $insurance->translation->title }}
+                                <option value="{{ $insurance->id }}" 
+                                    {{ ($request->insurance_id ?? $insuranceID) == $insurance->id ? 'selected' : '' }}>
+                                    {{ $insurance->translation->title ?? 'N/A' }}
                                 </option>
                             @endforeach
                         </select>

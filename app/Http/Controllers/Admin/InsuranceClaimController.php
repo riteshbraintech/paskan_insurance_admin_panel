@@ -17,30 +17,40 @@ class InsuranceClaimController extends Controller
         $current_page = $request->page ?? 1;
         $search = $request->search ?? "";
         $perPage = $request->perPage ?? 50;
-        $isAjax = $request->ajax();
+        $isAjax = $request->method;
 
-        // Start query builder
-        $records = InsuranceClaim::with('translations');
+        $insurances = Insurance::with('translation')->get();
+        // Choose first Insurance as default
+        $defaultInsuranceID = $insurances->first()->id ?? null;
+        $insuranceID = $request->insurance_id ?? $defaultInsuranceID;
+        $records = InsuranceClaim::with(['translations', 'translation'])
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('translations', function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($insuranceID, function ($query) use ($insuranceID) {
+                $query->where('insurance_id', $insuranceID);
+            })
+            ->sortable(['sort_order' => 'asc'])
+            ->paginate($perPage);
+        // dd($records);
 
-        // Apply search
-        if ($search) {
-            $records->whereHas('translations', function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%");
-            });
-        }
 
-        // Sorting + pagination
-        $records = $records->sortable(['sort_order' => 'asc'])->paginate($perPage);
+        // always choosen first as default
+        $request->merge([
+            'insurance_id' => $insuranceID 
+        ]);
 
-        // If you need all for dropdown
-        $insurances = Insurance::with('translations')->get();
 
-        if ($isAjax) {
+
+        if (!empty($isAjax)) {
             $html = view('admin.claiminsurance.table', compact('records'))->render();
             return response()->json(['html' => $html]);
+        } else {
+            return view('admin.claiminsurance.index', compact('records','insurances','insuranceID'));
         }
 
-        return view('admin.claiminsurance.index', compact('records','insurances'));
     }
 
 
@@ -113,7 +123,7 @@ class InsuranceClaimController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.claiminsurance.index')
+                ->route('admin.claiminsurance.index',['insurance_id'=> $request->insurance_id])
                 ->with('success', 'FAQ Insurance Claimed Added successfully.');
 
         } catch (\Throwable $th) {
@@ -215,7 +225,7 @@ class InsuranceClaimController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.claiminsurance.index')
+                ->route('admin.claiminsurance.index',['insurance_id'=> $field->insurance_id])
                 ->with('success', 'FAQ Insurance Claim Field updated successfully.');
 
         } catch (\Throwable $th) {

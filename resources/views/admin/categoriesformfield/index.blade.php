@@ -53,8 +53,9 @@
                         <select id="categoryFilter" name="category_id" class="form-select">
                             <option value="">-- Filter by Category --</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" {{ $categoryID == $category->id ? 'selected' : '' }}>
-                                    {{ $category->translation->title ?? 'Unnamed' }}
+                                <option value="{{ $category->id }}"
+                                    {{ ($request->category_id ?? $categoryID) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->translation->title ?? 'N/A' }}
                                 </option>
                             @endforeach
                         </select>
